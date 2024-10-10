@@ -1,0 +1,41 @@
+<nav class="nav-container">
+    <div class="nav-sec-1" (click)="toggleMenu()">
+        <div class="flex items-center cursor-pointer">
+            <img [src]="menuImgSrc" class="nav-menu-icon" />
+            <h2 class="ml-2 nav-menu-title">Menu</h2>
+        </div>
+    </div>
+
+    <div class="nav-sec-2">
+        <h2 class="nav-title">{{ title | translate }}</h2>
+    </div>
+</nav>
+
+<div *ngIf="isMenuVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isMenuVisible" class="menu-hamburger" >
+    <div class="menu-hamburger-flex" (click)="toggleMenu()">
+        <img [src]="menuImgSrc" alt="logo" class="nav-menu-icon mr-2" />
+        <h2 class="nav-menu-title">Menu</h2>
+    </div>
+    <hr class="menu-hr">
+    <div>
+        <button class="menu-hamburger-flex" routerLink="/client" (click)="toggleMenu()">
+            <img alt="home" src="assets/icons/dash.png" class="nav-menu-icon mr-2" />
+            <h2 class="nav-menu-title ">{{ 'dashboard' | translate }}</h2>
+        </button>
+    </div>   
+    
+    <hr class="menu-hr">
+    <div>
+        <h2 class="menu-title py-[.5rem]" routerLink="/client/statistique" (click)="toggleMenu()">{{ 'statisticsTickets' | translate }}</h2>
+        <h2 class="menu-title py-[.5rem]" routerLink="/client/tickets" (click)="toggleMenu()">{{ 'listingTickets' | translate }}</h2>
+    </div>   
+    
+    <hr class="menu-hr">
+    <div>
+        <h2 class="menu-title py-[.5rem]" routerLink="/client/customer" (click)="toggleMenu()">{{ 'searchClient' | translate }}</h2>
+    </div>
+    
+    <hr class="menu-hr">
+</div>
+

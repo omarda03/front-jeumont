@@ -1,0 +1,11 @@
+<div class="font-inter fixed inset-0 flex items-center justify-center z-50">
+  <div class="fixed inset-0 bg-gray-600 opacity-50"></div>
+  <div class="bg-white w-96 mx-auto rounded-lg shadow-lg z-50 border border-solid border-[#E30039]">
+    <div class="p-4 flex justify-center items-center">
+      <img *ngIf="!error" src="assets/icons/success.png" class="w-8 h-8 mr-2"/>
+      <img *ngIf="error" src="assets/icons/error.png" class="w-8 h-8 mr-2"/>
+      <p class="text-sm font-semibold">{{popupText}}</p>
+    </div>
+  </div>
+</div>
+  

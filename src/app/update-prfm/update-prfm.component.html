@@ -1,0 +1,443 @@
+<div class="text-sm font-inter mx-2 py-4 bg-[#D9D9D9] grid grid-cols-4">
+    <div class="col-span-1 mx-4">
+        <div>
+            <div class="flex justify-around my-1">
+                <h2 class=" bg-[#F5F5F5] w-1/2 py-1 px-2 rounded-l-[10px]">Status</h2>
+                <h2 class="flex justify-between items-center text-black  bg-custom w-1/2 py-1 px-2 rounded-r-[10px]" [ngStyle]="{ 'background-color': 'rgba(' + getColorRGB(asked.Status.status_color) + ', 0.6)' }">
+                    <h3>{{ asked.Status.status_label }}</h3>
+                </h2>
+                <button
+                    (click)= "toggleStatus()"
+                    *ngIf="!isCustomerEnabled()"
+                >
+                    <img                                        
+                        src="assets/icons/update.png"
+                        [ngClass]="updateStatus ? 'bg-custom p-2 rounded-md w-8 h-8 ml-2':'bg-[#F5F5F5] p-2 rounded-md w-8 h-8 ml-2'"
+                    >
+                </button>
+            </div>
+            <div *ngIf="updateStatus" class="my-1">
+                <select 
+                    [(ngModel)]="asked.status_id"
+                    class="bg-[#F5F5F5] mb-2 px-3 py-1 rounded-[10px] w-full">
+                    <!--
+                        <option value="0">None</option>
+                    -->
+                    <ng-container *ngFor="let status of allStatus">
+                        <option *ngIf="status.status_id !== 6" [value]="status.status_id">{{ status.status_label }}</option>
+                    </ng-container>   
+                </select>
+            </div>
+            <div class="flex justify-around my-1">
+                <h2 class="text-white bg-custom w-1/2 py-1 px-2 rounded-l-[10px]">Side</h2>
+                <h2 class="flex justify-between items-center bg-[#F5F5F5] w-1/2 py-1 px-2 rounded-r-[10px]">
+                    {{ asked.Side.side_label }}
+                </h2>
+                <button
+                    (click) = "toggleSide()"
+                    *ngIf="!isCustomerEnabled()"
+                >
+                    <img
+                        src="assets/icons/update.png"
+                        [ngClass]="updateSide ? 'bg-custom p-2 rounded-md w-8 h-8 ml-2':'bg-[#F5F5F5] p-2 rounded-md w-8 h-8 ml-2'"
+                    >
+                </button>
+            </div>
+            <div *ngIf="updateSide" class="my-1">
+                <select 
+                    [(ngModel)]="asked.side_id"
+                    class="bg-[#F5F5F5] mb-2 px-3 py-1 rounded-[10px] w-full">
+                    <!--
+                        <option value="0">None</option>
+                    -->
+                    <option *ngFor="let side of sides" [value]="side.side_id">{{ side.side_label }}</option>
+                </select>
+            </div>
+        </div>
+        <div class="mt-6">
+            <div class="border-t border-dashed border-black py-2">
+                <h2 class="text-base font-bold mb-2">Prfs :</h2>
+                <div class="px-4">
+                    <div class="flex flex-col justify-center items-center">
+                        <select *ngIf="!isCustomerEnabled()" [(ngModel)]="prfs_asked_uuid" class="bg-white border border-solid border-black mb-2 px-3 py-1 w-full">
+                            <!--
+                                <option value="">None</option>
+                            -->
+                            <option *ngFor="let prfs of prfss" [value]="prfs.asked_uuid">{{ prfs.asked_ref }}</option>
+                        </select>
+                        <button  
+                            *ngIf="!isCustomerEnabled()"
+                            (click)="addAskedToTable()"
+                            class="flex items-center justify-center text-black text-xs pb-2"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+                                <rect x="12.5" y="3" width="3" height="23" fill="black"/>
+                                <rect x="25.1355" y="12.3625" width="3" height="23" transform="rotate(90 25.1355 12.3625)" fill="black"/>
+                            </svg>
+                            Add Prfs
+                        </button>
+                    </div>
+                    <ul class="mb-2">
+                        <li *ngFor="let prfs of prfssAdded; let i = index">
+                            <button (click)="removeAsked(i)" class="text-black flex justify-center items-center">
+                                <span class="mr-2">{{ prfs.asked_ref }}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <rect y="5.0481" width="7.13924" height="25.8798" transform="rotate(-45 0 5.0481)" fill="black"/>
+                                    <rect x="18.2998" width="7.13924" height="25.8798" transform="rotate(45 18.2998 0)" fill="black"/>
+                                </svg>
+                            </button>
+                        </li>
+                    </ul>
+                    <div *ngFor="let prfs of prfssAsked" class="flex justify-start items-center mb-1">
+                        <h1>{{ prfs.asked_prfs_ref }}</h1>
+                        <button class="ml-2" (click)="DeletePrfsRelated(prfs.asked_prfs_uuid, prfs.asked_prfm_uuid)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <rect y="5.0481" width="7.13924" height="25.8798" transform="rotate(-45 0 5.0481)" fill="black"/>
+                                <rect x="18.2998" width="7.13924" height="25.8798" transform="rotate(45 18.2998 0)" fill="black"/>
+                            </svg>
+                        </button>
+                    </div> 
+                </div>
+            </div>
+        </div>
+        <div class="mt-6">
+            <div class="border-t border-dashed border-black py-2">
+                <h2 class="text-base font-bold mb-2">Ships :</h2>
+                <div class="px-4">
+                    <div class="flex flex-col justify-center items-center">
+                        <select *ngIf="!isCustomerEnabled()" [(ngModel)]="ship_uuid" class="bg-white border border-solid border-black mb-2 px-3 py-1 w-full">
+                            <!--
+                                <option value="">None</option>
+                            -->
+                            <option *ngFor="let ship of ships" [value]="ship.ship_uuid">{{ ship.ship_name }}</option>
+                        </select>
+                        <button  
+                            *ngIf="!isCustomerEnabled()"
+                            (click)="addShipToTable()"
+                            class="flex items-center justify-center text-black text-xs pb-2"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+                                <rect x="12.5" y="3" width="3" height="23" fill="black"/>
+                                <rect x="25.1355" y="12.3625" width="3" height="23" transform="rotate(90 25.1355 12.3625)" fill="black"/>
+                            </svg>
+                            Add Ship
+                        </button>
+                    </div>
+                    <ul class="mb-2">
+                        <li *ngFor="let ship of shipsAdded; let i = index">
+                            <button (click)="removeShip(i)" class="text-black flex justify-center items-center">
+                                <span class="mr-2">{{ ship.ship_name }}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <rect y="5.0481" width="7.13924" height="25.8798" transform="rotate(-45 0 5.0481)" fill="black"/>
+                                    <rect x="18.2998" width="7.13924" height="25.8798" transform="rotate(45 18.2998 0)" fill="black"/>
+                                </svg>
+                            </button>
+                        </li>
+                    </ul>
+                    <div *ngFor="let ship of shipsAsked" class="flex justify-start items-center mb-1">
+                        <h1>{{ ship.Ship.ship_name }}</h1>
+                        <button class="ml-2" (click)="DeleteShipRelated(asked.asked_uuid, ship.ship_uuid)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <rect y="5.0481" width="7.13924" height="25.8798" transform="rotate(-45 0 5.0481)" fill="black"/>
+                                <rect x="18.2998" width="7.13924" height="25.8798" transform="rotate(45 18.2998 0)" fill="black"/>
+                            </svg>
+                        </button>
+                    </div> 
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-[#F5F5F5] mt-6 rounded-[10px] p-2">
+            <div class="flex justify-between items-center">
+                <div class="w-2 h-2 bg-custom rounded-full shadow-md shadow-black"></div>
+                <div>
+                    <h1 class="font-bold text-base">Action lists</h1>
+                </div>
+                <div>
+                    
+                </div>
+            </div>
+            <div class="h-[115px] overflow-y-scroll custom-scrollbar">
+                <div *ngFor="let log of askedLogByAsked" class="flex items-center justify-between">
+                    <h4 class="text-[10px] font-normal text-left"><span class="font-bold">{{log.asked_log_text}}</span>, By <span class="font-bold">{{log.User.user_name.charAt(0)}}{{ log.User.user_first_name.charAt(0) }}{{ log.User.user_first_name.charAt(1) }}</span></h4>
+                    <h4 class="text-[10px] font-normal text-left px-2">{{ log.asked_log_created_date | date:'dd MMM yyyy HH:mm:ss' }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-span-2 border-x border-dashed border-black px-2">
+        <div class="flex justify-between items-center py-4 px-4 border-b border-dashed border-black">
+            <div class="flex items-center justify-between">
+                <img src="assets/icons/user.png" alt="" class="w-6 h-6" />
+                <h5 class="ml-2 font-bold text-base">{{ asked.Ship.Fleet.Customer.customer_name }}</h5>
+            </div>
+            <div class="flex items-center justify-between">
+                <img src="assets/icons/ship.png" alt="" class="w-8 h-4" />
+                <h5 class="ml-2 font-bold text-base">{{ asked.Ship.ship_name }}</h5>
+            </div>
+            <div class="text-left mt-1 text-[11px]">
+                <h5>Creation: <span>{{ asked.asked_created_date | date:'dd MMM yyyy HH:mm:ss' }}</span></h5>
+                <h5 *ngIf="asked.asked_updated_date">Update: <span>{{ asked.asked_updated_date | date:'dd MMM yyyy HH:mm:ss' }}</span></h5>
+            </div> 
+        </div>
+        <div class="py-4">
+            <div class="mb-2">
+                <p *ngIf="isCustomerEnabled()" class="text-base font-bold flex items-center">Description</p>
+                <button     
+                    *ngIf="!isCustomerEnabled()"
+                    class="text-black text-base font-bold flex items-center" 
+                    (click)="toggleUpdateDescription()"
+                >
+                    Description
+                    <img
+                        src="assets/icons/update.png"
+                        alt=""
+                        [ngClass]="updateDescription ? 'bg-custom p-2 rounded-md w-8 h-8 ml-2':'bg-[#F5F5F5] p-2 rounded-md w-8 h-8 ml-2'"
+                    >
+                </button>
+                <textarea *ngIf="!updateDescription"  class="bg-[#F5F5F5] w-[98%] p-2 mx-2 h-[60px] my-2">{{asked.asked_description}}</textarea>
+                <textarea *ngIf="updateDescription"  [(ngModel)]="asked.asked_description" class="bg-[#F5F5F5] w-[98%] px-2 mx-2 h-[60px] my-2" ></textarea>
+            </div>
+            <div class="mb-4">
+                <p *ngIf="isCustomerEnabled()" class="text-base font-bold flex items-center">Resume</p>
+                <button     
+                    *ngIf="!isCustomerEnabled()"
+                    class="text-base font-bold flex items-center" 
+                    (click)="toggleUpdateResume()">
+                    Resume
+                    <img
+                        src="assets/icons/update.png"
+                        alt=""
+                        [ngClass]="updateResume ? 'bg-custom p-2 rounded-md w-8 h-8 ml-2':'bg-[#F5F5F5] p-2 rounded-md w-8 h-8 ml-2'"
+                    >
+                </button>
+                <textarea *ngIf="!updateResume" class="bg-custom w-[98%] text-white p-2 mx-2 h-[50px] my-2">{{asked.prfm_resume}}</textarea>
+                <textarea *ngIf="updateResume" type="text" [(ngModel)]="asked.prfm_resume" class="bg-custom w-[98%] text-white px-2 mx-2 h-[50px] my-2"></textarea>
+
+            </div>
+        </div>
+        
+        <div 
+            class=" border-style justify-around py-2"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop($event)"
+        >
+            <div class="bg-[#ffffff99] h-auto py-2 px-2 rounded-[10px] mb-2 grid grid-cols-2">
+                <div class="bg-[#D9D9D9] p-2 mx-2 rounded-[10px] h-[90px] overflow-y-scroll custom-scrollbar">   
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="text-sm text-[#00000059] px-2">Name</th>
+                                <th class="text-sm text-[#00000059] px-2">Size</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let att of attachements">
+                                <td class="text-[9px] lowercase">
+                                    {{ att.doc_last_version }}
+                                </td>
+                                <td class="text-[9px]">
+                                    {{ (att.doc_size / (1024 * 1024)) | number: '1.2-2' }} Mo
+                                </td>
+                                <td>
+                                    <div class="flex justify-center items-center">
+                                        <img
+                                            src="assets/icons/download.png"
+                                            (click)="downloadFile(att.doc_url)"
+                                            class="w-4 h-4 ml-1 cursor-pointer"
+                                        />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="flex justify-center items-center">
+                                        <button (click)="toggleDeleteFileTicket(att)" class="ml-2 text-red-500">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="w-4 h-4"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                    
+                            <tr *ngFor="let file of files">
+                                <td class="text-[9px] lowercase">
+                                    {{ file.name }}
+                                </td>
+                                <td class="text-[9px]">
+                                    {{ file.size }} 
+                                </td>
+                                <td>
+                                    <div class="flex justify-center items-center">
+                                        <a [href]="file.path" class="flex flex-col items-center" download="{{ getFileNameWithoutExtension(file.name) }}">
+                                            <img src="assets/icons/download.png" class="w-4 h-4 ml-2 cursor-pointer" />
+                                        </a>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="flex justify-center items-center">
+                                        <button (click)="toggleDeleteFileToDownloadTicket(file)" class="ml-2 text-red-500">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="w-4 h-4"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>                                        
+                </div>
+                <div 
+                    (drop)="onDrop($event)"
+                    (dragover)="onDragOver($event)" 
+                    class="border border-dotted border-black p-2 rounded-[10px] text-[10px]"
+                >
+                    <div class="flex justify-center">
+                        <label for="fileInput" class="font-semibold cursor-pointer text-center">Drag and drop</label>
+                    </div>
+                    <div class="flex items-center justify-between mx-16">
+                        <div class="flex-1 border-t-2 border-[#E30039]"></div>
+                        <h1 class="text-center text-base md:text-lg font-semibold px-2"> Or </h1>
+                        <div class="flex-1 border-t-2 border-[#E30039]"></div>
+                    </div>
+                    <div class="flex justify-center">
+                        <button (click)="toggleBrowsefiles()" class="rounded-[10px] bg-custom text-black py-1 px-8">Browse files</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-around">
+            <button (click)="submitForm()" class="flex items-center bg-custom font-bold px-16 py-2 rounded-[10px] text-black border border-solid border-black">
+                <span *ngIf="!loading" class="flex items-center">
+                    <img
+                        src="assets/icons/save.png"
+                        alt=""
+                        class="mr-2"
+                    />
+                    Update ticket
+                </span>
+                <span *ngIf="loading" class="flex items-center">
+                    <svg class="animate-spin h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.963 7.963 0 014 12H0c0 4.418 3.582 8 8 8v-4.01zm13.196-1.383A10.001 10.001 0 0021.22 12h-4.02a6.001 6.001 0 11-6.001-6h-2a8.001 8.001 0 108.177 5.908l1.018 1.018z"></path>
+                    </svg>
+                    Loading...
+                </span>
+            </button>
+            <button 
+                (click)="cancel()"
+                class="flex items-center bg-white font-bold px-16 py-2 rounded-[10px] text-black border border-solid border-black"
+            >
+                <img
+                    src="assets/icons/cancel.png"
+                    alt=""
+                    class="mr-2"
+                />
+                Cancel
+            </button>
+        </div>
+    </div>
+    <div class="col-span-1 px-2">
+        <app-chat [idAsked]="askedUuid"></app-chat>
+    </div>
+</div>
+
+<app-popup *ngIf="isVisible" [popupText]="text"></app-popup>
+
+<div *ngIf="isDeleteFileTicketVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isDeleteFileTicketVisible" class="font-bold absolute top-1/3 left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-[#E30039] bg-white z-50 py-2 shadow-lg ">
+    <div class="flex justify-between px-4 py-1">
+        <div></div>
+        <div>
+            <h1 class="font-bold mb-1">Delete file</h1>
+        </div>
+        <div>
+            <img
+                (click)="cancelDeleteFile()"
+                alt="Icon close"
+                src="assets/icons/close.png"
+                class="w-4 h-4 cursor-pointer"
+            />
+        </div>
+    </div>   
+    <div class="px-2">
+        <hr class="px-2 border border-dashed border-gray-600">
+        <h2 class="text-sm text-center mt-4">Are you certain that you intended to delete this file?</h2>
+    </div>   
+    <div class="flex justify-between px-6 py-8">
+        <button class="rounded-[10px] px-8 py-2 border border-black font-bold shadow-lg" (click)="cancelDeleteFile()">Cancel</button>
+        <button class="rounded-[10px] bg-custom text-white font-bold shadow-lg py-2 px-8" (click)="clickDeleteFile()">Delete</button>
+    </div>
+</div>
+
+<div *ngIf="isDeleteFileToDownloadTicketVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isDeleteFileToDownloadTicketVisible" class="font-bold absolute top-1/3 left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-[#E30039] bg-white z-50 py-2 shadow-lg ">
+    <div class="flex justify-between px-4 py-1">
+        <div></div>
+        <div>
+            <h1 class="font-bold mb-1">Delete file</h1>
+        </div>
+        <div>
+            <img
+                (click)="cancelDeleteFileToDownload()"
+                alt="Icon close"
+                src="assets/icons/close.png"
+                class="w-4 h-4 cursor-pointer"
+            />
+        </div>
+    </div>   
+    <div class="px-2">
+        <hr class="px-2 border border-dashed border-gray-600">
+        <h2 class="text-sm text-center mt-4">Are you certain that you intended to delete this file?</h2>
+    </div>   
+    <div class="flex justify-between px-6 py-8">
+        <button class="rounded-[10px] px-8 py-2 border border-black font-bold shadow-lg" (click)="cancelDeleteFileToDownload()">Cancel</button>
+        <button class="rounded-[10px] bg-custom text-white font-bold shadow-lg py-2 px-8" (click)="clickDeleteFileToDownload()">Delete</button>
+    </div>
+</div>
+
+<div *ngIf="isBrowsefiles" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isBrowsefiles" class="font-bold absolute top-1/3 left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-[#E30039] bg-white z-50 py-2 shadow-lg ">
+    <div class="flex justify-between px-4 py-1 border-dashed border-b-2">
+        <div></div>
+        <div>
+            <h1 class="font-bold mb-1">Browse files</h1>
+        </div>
+        <div>
+            <img
+                (click)="toggleBrowsefiles()"
+                alt="Icon close"
+                src="assets/icons/close.png"
+                class="w-4 h-4 cursor-pointer"
+            />
+        </div>
+    </div>   
+    <div class="px-6 flex flex-col py-8">
+        <div class="my-2">
+            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="pddInput" (change)="onFileChange($event, 'OMD')" multiple>
+            <label for="pddInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Officiel modification document</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" class="hidden" id="autresInput" (change)="onFileChange($event, 'other')" multiple>
+            <label for="autresInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Others</h1>    
+            </label>
+        </div>
+    </div>
+</div>

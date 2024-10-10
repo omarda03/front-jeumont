@@ -1,0 +1,243 @@
+<div>
+  <div class="flex items-center justify-center gap-4 mb-1">
+    <button class="header-buttons-item" (click)="toggleAddEvent()">Add to planning</button>
+    <button class="header-buttons-item" (click)="toggleUpdateEvent()">Update planning</button>
+    <button class="header-buttons-item" (click)="genererAstreintes()">Generer les astreintes</button>
+  </div>
+  <ejs-schedule #scheduleObj width='100%' height='700px' [allowInline]="allowInline" [eventSettings]="eventSettings"
+    [selectedDate]="selectedDate" [group]="group" cssClass="quick-info-popup" [readonly]="true" (actionFailure)="onActionFailure($event)">
+    <e-resources>
+      <e-resource field='EmployeeId' title='Employees' name='Employee' [allowMultiple]='allowMultiple'
+        [dataSource]='employeeDataSource' textField='Name' idField='Id' groupIDField="GroupId" colorField='Color'>
+      </e-resource>
+    </e-resources>
+  </ejs-schedule>
+</div>
+
+<div *ngIf="isAddEventVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isAddEventVisible" class="font-inter font-bold absolute top-[6rem] left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-[#E30039] bg-white z-50 p-[2rem] shadow-lg ">
+  <div class="flex items-center justify-between p-4 py-1 mb-4">
+    <div></div>
+    <div>
+      <h1 class="text-[1.5rem] font-bold">Add to planning file</h1>
+    </div>
+    <div>
+      <img alt="Close" src="assets/icons/close.png" class="w-6 h-6 cursor-pointer" (click)="toggleAddEvent()" />
+    </div>
+  </div>   
+  <div class="px-2">
+    <div class="flex items-center justify-around my-4">
+      <div class="flex items-center">
+        <input type="checkbox" [(ngModel)]="isWeek" (ngModelChange)="updateCheckbox('isWeek')" />
+        <h1 class="text-[1rem] font-semibold ml-2">By week</h1>
+      </div>
+      <div class="flex items-center">
+        <input type="checkbox" [(ngModel)]="isDate" (ngModelChange)="updateCheckbox('isDate')"/>
+        <h1 class="text-[1rem] font-semibold ml-2">By date</h1>
+      </div>
+    </div>
+    <div class="w-[28rem]">
+      <div *ngIf="isWeek">
+        <div class="flex justify-between items-center mb-4">
+          <label class="text-[1rem] font-semibold">Week :</label>
+          <select class="creation-item-select " [(ngModel)]="idWeek">
+            <!--
+              <option value="0" selected>None</option>
+            -->
+            <ng-container *ngFor="let week of weeks">
+              <option *ngIf="week.week_id >= currentWeek" [value]="week.week_id">{{ week.week_label }}</option>
+            </ng-container>
+          </select>
+        </div>
+        <div class="flex justify-between items-center mb-4">
+          <label class="text-[1rem] font-semibold">Year :</label>
+          <select class="creation-item-select" [(ngModel)]="idYear">
+            <!--
+              <option value="0" selected>None</option>
+            -->
+            <ng-container *ngFor="let year of years">
+              <option *ngIf="year.year_id >= currentYear" [value]="year.year_id">{{ year.year_label }}</option>
+            </ng-container>
+          </select>
+        </div>
+      </div>
+      <div *ngIf="isDate">
+        <div class="flex justify-between items-center mb-4">
+          <label class="text-[1rem] font-semibold">Date start :</label>
+          <input type="datetime-local" class="text-[.9rem] font-medium p-[.25rem] border border-black" [(ngModel)]="date_start" />
+        </div>
+        <div class="flex justify-between items-center mb-4">
+          <label class="text-[1rem] font-semibold">Date end :</label>
+          <input type="datetime-local" class="text-[.9rem] font-medium p-[.25rem] border border-black" [(ngModel)]="date_end" />
+        </div>
+      </div>
+      <div class="flex justify-between items-center mb-4">
+        <label class="text-[1rem] font-semibold">User :</label>
+        <select class="creation-item-select" [(ngModel)]="userId">
+          <!--
+            <option value="" selected>None</option>
+          -->
+          <ng-container *ngFor="let user of addToBackUp">
+            <option [value]="user.Id">{{ user.Name }}</option>
+          </ng-container>
+        </select>
+      </div>
+      <div class="mb-2">
+        <h1 class="text-[1rem] font-semibold mb-2">Reason :</h1>
+        <textarea class="h-[5rem] border border-solid border-black w-[100%] p-1 text-[12px] font-normal" [(ngModel)]="reason" placeholder="reason"></textarea>
+      </div>
+      <div *ngIf="errorMessage" class="text-left text-[#FF0000] capitalize my-2 text-sm font-semibold">
+        {{ errorMessage }}
+      </div>
+      <div class="flex items-center justify-around my-3">
+        <div class="flex items-center">
+          <input type="checkbox" [(ngModel)]="primary_backup" />
+          <label class="text-[1rem] font-semibold ml-2">Primary</label>
+        </div>
+        <div class="flex items-center">
+          <input type="checkbox" [(ngModel)]="emergency_backup" />
+          <label class="text-[1rem] font-semibold ml-2">Emergency</label>
+        </div>
+        <div class="flex items-center">
+          <input type="checkbox" [(ngModel)]="indisponible" />
+          <label class="text-[1rem] font-semibold ml-2">Indisponible</label>
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-around items-center my-2">
+      <button (click)="toggleAddEvent()" class="header-buttons-cancel">Cancel</button>
+      <button (click)="onAddToPlanning()" class="header-buttons-item">Add</button>
+    </div>
+  </div>   
+</div>
+
+<div *ngIf="isChangeEventVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isChangeEventVisible" class="font-inter font-bold absolute top-[6rem] left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-[#E30039] bg-white z-50 p-[2rem] shadow-lg ">
+  <div class="flex items-center justify-between p-4 py-1 mb-4">
+    <div></div>
+    <div>
+      <h1 class="text-[1.5rem] font-bold">Update planning</h1>
+    </div>
+    <div>
+      <img alt="Close" src="assets/icons/close.png" class="w-6 h-6 cursor-pointer" (click)="toggleUpdateEvent()" />
+    </div>
+  </div>   
+
+  <div class="px-2">
+    <div class="w-[28rem]">
+      <div class="flex justify-between items-center my-3">
+        <label class="text-[1rem] font-semibold">Planning</label>
+        <select class="creation-item-select" [(ngModel)]="oncall" (ngModelChange)="assignOnCallToUpdate()">
+          <!--
+            <option [ngValue]="undefined" selected>None</option>
+          -->
+          <ng-container *ngFor="let call of oncalls">
+            <option [ngValue]="call">
+              <ng-container *ngIf="call.isWeek">
+                {{ call.user_name }} {{ call.user_first_name }} || {{ call.week_id }} {{ call.year_id }}
+              </ng-container>
+              <ng-container *ngIf="call.isDate">
+                {{ call.user_name }} {{ call.user_first_name }} || {{ call.date_start | date:'yyyy MMM dd HH:mm' }} {{ call.date_end | date:'yyyy MMM dd HH:mm' }}
+              </ng-container>
+            </option>
+          </ng-container>          
+        </select>  
+      </div>
+      <div *ngIf="oncall">
+        <div class="flex items-center justify-around my-4">
+          <div class="flex items-center">
+            <input type="checkbox" [(ngModel)]="oncallToUpdate.isWeek" (ngModelChange)="oncallToUpdate.isDate = !oncallToUpdate.isWeek" />
+            <h1 class="text-[1rem] font-semibold ml-2">By week</h1>
+          </div>
+          <div class="flex items-center">
+            <input type="checkbox" [(ngModel)]="oncallToUpdate.isDate" (ngModelChange)="oncallToUpdate.isWeek = !oncallToUpdate.isDate"/>
+            <h1 class="text-[1rem] font-semibold ml-2">By date</h1>
+          </div>
+        </div>
+        <div *ngIf="oncallToUpdate.isWeek">
+          <div class="flex justify-between items-center mb-4">
+            <label class="text-[1rem] font-semibold">Week :</label>
+            <select class="creation-item-select" [(ngModel)]="oncallToUpdate.week_id">
+              <!--
+                <option value="0" selected>None</option>
+              -->
+              <ng-container *ngFor="let week of weeks">
+                <option [value]="week.week_id">{{ week.week_label }}</option>
+              </ng-container>
+            </select>
+          </div>
+          <div class="flex justify-between items-center mb-4">
+            <label class="text-[1rem] font-semibold">Year :</label>
+            <select class="creation-item-select" [(ngModel)]="oncallToUpdate.year_id">
+              <!--
+                <option value="0" selected>None</option>
+              -->
+              <ng-container *ngFor="let year of years">
+                <option [value]="year.year_id">{{ year.year_label }}</option>
+              </ng-container>
+            </select>
+          </div>
+        </div>
+        <div *ngIf="oncallToUpdate.isDate">
+          <div class="flex justify-between items-center mb-4">
+            <label class="text-[1rem] font-semibold">Date start :</label>
+            <input 
+              type="datetime-local"
+              [ngModel]="oncallToUpdate.date_start | date:'yyyy-MM-ddTHH:mm'" 
+              (ngModelChange)="oncallToUpdate.date_start = $event" 
+              class="text-[.9rem] font-medium p-[.25rem] border border-black"
+            />
+          </div>
+  
+          <div class="flex justify-between items-center mb-4">
+            <label class="text-[1rem] font-semibold">Date end :</label>
+            <input 
+              type="datetime-local"
+              [ngModel]="oncallToUpdate.date_end | date:'yyyy-MM-ddTHH:mm'" 
+              (ngModelChange)="oncallToUpdate.date_end = $event"
+              class="text-[.9rem] font-medium p-[.25rem] border border-black" 
+            />
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-4">
+          <label class="text-[1rem] font-semibold">User</label>
+          <select class="creation-item-select" [(ngModel)]="oncallToUpdate.user_uuid">
+            <!--
+              <option value="" selected>None</option>
+            -->
+            <ng-container *ngFor="let user of addToBackUp">
+              <option [value]="user.Id">{{ user.Name }}</option>
+            </ng-container>
+          </select>
+        </div>
+        <div>
+          <h1 class="text-[1rem] font-semibold mb-2">Reason :</h1>
+          <textarea class="h-[5rem] border border-solid border-black w-[100%] p-1 text-[12px] font-normal" [(ngModel)]="oncallToUpdate.reason" placeholder="reason"></textarea>
+        </div>
+        
+        <div class="flex items-center justify-around my-4">
+          <div class="flex items-center">
+            <input type="checkbox" [(ngModel)]="oncallToUpdate.primary_backup" />
+            <label class="text-[1rem] font-semibold ml-2">Primary </label>
+          </div>
+          <div class="flex items-center">
+            <input type="checkbox" [(ngModel)]="oncallToUpdate.emergency_backup" />
+            <label class="text-[1rem] font-semibold ml-2">Emergency </label>
+          </div>
+          <div class="flex items-center">
+            <input type="checkbox" [(ngModel)]="indisponible" />
+            <label class="text-[1rem] font-semibold ml-2">Indisponible</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-between items-center mb-2">
+      <button (click)="cancelUpdatePlanning()" class="header-buttons-cancel">Cancel</button>
+      <button (click)="onDeletePlanning()" [disabled]="oncall === undefined" class="header-buttons-delete">Delete</button>
+      <button (click)="onUpdatePlanning()" [disabled]="oncall === undefined" class="header-buttons-item">Update</button>
+    </div>
+  </div>
+</div>
+
+<app-popup *ngIf="isVisible" [error]="isError" [popupText]="text"></app-popup>

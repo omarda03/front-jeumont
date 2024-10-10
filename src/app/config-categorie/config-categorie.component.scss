@@ -1,0 +1,36 @@
+input {
+    outline: none; /* Remove the default focus outline */
+}
+/* Button Styles */
+.button-style {
+    display: flex;
+    // align-items: center;
+    // justify-content: center;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    // margin-right: -20rem; /* Adjust margin as needed */
+    font-weight: bold;
+    cursor: pointer;
+    width: 100px;
+}
+
+/* Add Button Style */
+.add-button {
+    background-color: #4caf50; /* Green color */
+}
+
+/* Edit Button Style */
+.edit-button {
+    background-color: #2196F3; /* Blue color */
+}
+
+/* Delete Button Style */
+// .delete-button {
+//     background-color: #f44336; /* Red color */
+// }
+
+/* Hover effect */
+.button-style:hover {
+    opacity: 0.8;
+}

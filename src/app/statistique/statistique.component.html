@@ -1,0 +1,252 @@
+<div class="container-page">
+    <aside class="grid grid-cols-4 gap-3 mb-2">
+        <div class="statistique-item">
+            <h2 class="statistique-item-title">Opened</h2>
+            <h6 class="text-center p-3 page-title">{{ statistics.opened }}</h6>
+        </div>
+        <div class="statistique-item">
+            <h2 class="statistique-item-title">Resolved</h2>
+            <h6 class="text-center p-3 page-title">{{ statistics.resolved }}</h6>
+        </div>
+        <div class="statistique-item">
+            <h2 class="statistique-item-title">Unresolved</h2>
+            <h6 class="text-center p-3 page-title">{{ statistics.unresolved }}</h6>
+        </div>
+        <div class="statistique-item">
+            <h2 class="statistique-item-title">One-Touch</h2>
+            <h6 *ngIf="statistics.oneTouch !== undefined" class="text-center p-3 page-title">{{ (statistics.oneTouch).toFixed(2) }}%</h6>
+        </div>
+        <!--
+            <div class="statistique-item">
+                <h2 class="statistique-item-title">Avg Clos</h2>
+                <h6 class="text-center p-3 page-title">{{ calculateTime() }}</h6>
+            </div>
+        -->
+    </aside>
+    <main class="statistique-main">
+        <div class="statistique-main-filter">
+            <div class="statistique-main-filter-item">
+                <div class="mr-2">
+                    <label class="page-title mr-2">Number :</label>
+                    <input type="radio" [(ngModel)]="selectedMode" (change)="updateChartData()" value="number" />
+                </div>
+                <div>
+                    <label class="page-title mr-2">Percent :</label>
+                    <input type="radio" [(ngModel)]="selectedMode" (change)="updateChartData()" value="percent" />
+                </div>
+            </div>
+            
+            <div class="statistique-main-filter-item my-2">
+                <div class="dashboard-menu-item-1">
+                    <h1 class="alignements">Date start</h1>
+                    <input
+                        class="ml-2 dashboard-menu-item-select"
+                        type="date"
+                        [(ngModel)]="startDate"
+                        (ngModelChange)="updateChartData()"
+                    />
+                </div>
+            </div>
+            <div class="statistique-main-filter-item my-2" *ngIf="startDate">
+                <div class="dashboard-menu-item-1">
+                    <h1 class="alignements">Date end</h1>
+                    <input
+                        class="ml-2 dashboard-menu-item-select"
+                        type="date"
+                        [(ngModel)]="endDate"
+                        (ngModelChange)="updateChartData()"
+                        [min]="startDate"
+                    />
+                </div>
+            </div>
+            
+            <div class="statistique-main-filter-item my-2">
+                <div class="dashboard-menu-item-1">
+                    <h1 class="alignements">Customers :</h1>
+                    <select
+                        [(ngModel)]="client"
+                        (change)="updateChartData()"
+                        class="ml-2 dashboard-menu-item-select"
+                    >
+                        <option value="">All</option>
+                        <option *ngFor="let customer of customers" [value]="customer.customer_uuid">{{ customer.customer_name }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="statistique-main-filter-item my-2">
+                <div class="dashboard-menu-item-1">
+                    <h1 class="alignements">Users :</h1>
+                    <select
+                        [(ngModel)]="user"
+                        (change)="updateChartData()"
+                        class="ml-2 dashboard-menu-item-select"
+                    >
+                        <option value="">All</option>
+                        <option *ngFor="let user of users" [value]="user.user_uuid">{{ user.user_name }} {{ user.user_first_name }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="statistique-main-filter-item">
+                <div class="dashboard-menu-item-1">
+                    <h1 class="alignements">Ship :</h1>
+                    <select
+                        [(ngModel)]="ship"
+                        (change)="updateChartData()"
+                        class="ml-2 dashboard-menu-item-select"
+                    >
+                        <option value="">All</option>
+                        <option *ngFor="let ship of ships" [value]="ship.ship_uuid">{{ ship.ship_name }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="statistique-main-filter-item my-2">
+                <div class="dashboard-menu-item-1">
+                    <h1 class="alignements">Ticket type :</h1>
+                    <select
+                        [(ngModel)]="asked_type"
+                        (change)="updateChartData()"
+                        class="ml-2 dashboard-menu-item-select"
+                    >
+                        <!--
+                            <option value="">None</option>
+                        -->
+                        <option value="PRFS">PRFS</option>
+                        <option value="PRFM">PRFM</option>
+                        <option value="PRMA">PRMA</option>
+                    </select>
+                </div>
+            </div>            
+            <div *ngIf="asked_type === 'PRFS'" class="statistique-main-filter-item my-2">
+                <div class="dashboard-menu-item-1">
+                    <h1 class="alignements">Type :</h1>
+                    <select
+                        [(ngModel)]="skill"
+                        (change)="updateChartData()"
+                        class="ml-2 dashboard-menu-item-select"
+                    >
+                        <!--
+                            <option value="0">None</option>
+                        -->
+                        <option *ngFor="let skill of skills" [value]="skill.skill_id">{{ skill.skill_label }}</option>
+                    </select>
+                </div>
+            </div>
+            <div *ngIf="asked_type === 'PRFS'" class="statistique-main-filter-item">
+                <div class="dashboard-menu-item-1">
+                    <h1 class="alignements">Effects :</h1>
+                    <select
+                        [(ngModel)]="effect"
+                        (change)="updateChartData()"
+                        class="ml-2 dashboard-menu-item-select"
+                    >
+                        <!--
+                            <option value="0">None</option>
+                        -->
+                        <option *ngFor="let effect of effects" [value]="effect.effect_id">{{ effect.effect_label }}</option>
+                    </select>
+                </div>
+            </div>
+            <div *ngIf="asked_type === 'PRFS'" class="statistique-main-filter-item my-2">
+                <div class="dashboard-menu-item-1">
+                    <h1 class="alignements">Side :</h1>
+                    <select
+                        [(ngModel)]="side"
+                        (change)="updateChartData()"
+                        class="ml-2 dashboard-menu-item-select"
+                    >
+                        <!--
+                            <option value="0">None</option>
+                        --> 
+                        <option *ngFor="let side of sides" [value]="side.side_id">{{ side.side_label }}</option>
+                    </select>
+                </div>
+            </div>
+            <div *ngIf="asked_type === 'PRFS'" class="statistique-main-filter-item">
+                <div class="dashboard-menu-item-1">
+                    <h1 class="alignements">Tag :</h1>
+                    <select
+                        [(ngModel)]="tag"
+                        (change)="updateChartData()"
+                        class="ml-2 dashboard-menu-item-select"
+                    >
+                        <!--
+                            <option value="0">None</option>
+                        -->
+                        <option *ngFor="let tag of tags" [value]="tag.tag_id">{{ tag.tag_label }}</option>
+                    </select>
+                </div>
+            </div>
+            <div *ngIf="asked_type === 'PRFS'" class="statistique-main-filter-item my-2">
+                <div class="dashboard-menu-item-1">
+                    <h1 class="alignements">Type effect :</h1>
+                    <select
+                        [(ngModel)]="effectType"
+                        (change)="updateChartData()"
+                        class="ml-2 dashboard-menu-item-select"
+                    >
+                        <!--
+                            <option value="0">None</option>
+                        -->
+                        <option *ngFor="let effectType of effectTypes" [value]="effectType.effect_type_id">{{ effectType.effect_type_label }}</option>
+                    </select>
+                </div>
+            </div>
+            <div *ngIf="asked_type === 'PRFS'" class="statistique-main-filter-item my-2">
+                <div class="dashboard-menu-item-1">
+                    <h1 class="alignements">Comp level :</h1>
+                    <select
+                        [(ngModel)]="level"
+                        (change)="updateChartData()"
+                        class="ml-2 dashboard-menu-item-select"
+                    >
+                        <!--
+                            <option value="0">None</option>
+                        -->
+                        <option *ngFor="let level of levels" [value]="level.level_id">{{ level.level_label }}</option>
+                    </select>
+                </div>
+            </div>
+            <div *ngIf="asked_type === 'PRFS'" class="statistique-main-filter-item">
+                <div class="dashboard-menu-item-1">
+                    <h1 class="alignements">RI :</h1>
+                    <select
+                        [(ngModel)]="ri"
+                        (change)="updateChartData()"
+                        class="ml-2 dashboard-menu-item-select"
+                    >
+                        <!--
+                            <option value="0">None</option>
+                        -->
+                        <option value="1">Null</option>
+                        <option value="2">Not null</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="chartOptions" class="statistique-main-info bg-white">
+            <h2 class="bg-custom text-center page-title text-white py-2">Tickets per status</h2>
+            <div id="chart" class="px-6 py-4">
+                <apx-chart
+                    [series]="chartOptions.series"
+                    [chart]="chartOptions.chart"
+                    [dataLabels]="chartOptions.dataLabels"
+                    [plotOptions]="chartOptions.plotOptions"
+                    [yaxis]="chartOptions.yaxis"
+                    [xaxis]="chartOptions.xaxis"
+                    [legend]="chartOptions.legend"
+                    [colors]="chartOptions.colors"
+                    [grid]="chartOptions.grid"
+                ></apx-chart>
+            </div>
+
+        </div>
+    </main>
+    <!--
+        <div class="statistique-time mt-4">
+            <div *ngFor="let option of durationOptions" class="flex justify-center">
+                <label class="page-title mr-2">{{ option.label }}</label>
+                <input type="radio" [checked]="selectedDuration === option.value" (click)="updateDuration(option.value)" />
+            </div>
+        </div>
+    -->
+</div>

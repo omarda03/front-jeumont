@@ -1,0 +1,107 @@
+<div class="fixed w-[25%] pr-5 h-[100%]">
+    <div class="my-2 h-[60%]">
+        <div class="grid grid-cols-2 gap-4">
+            <div *ngIf="!isCustomerEnabled()" class="bg-[#ffffff99] rounded-[10px] py-1 px-3 flex items-center justify-between mb-1">
+                <h1 class="text-center my-2">Public</h1>
+                <div class="flex items-center justify-center">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" [(ngModel)]="message_public" class="sr-only peer">
+                        <div class="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 dark:peer-focus:ring-[#E30039] rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-[#E30039]"></div>
+                    </label>
+                </div>
+            </div>
+            <div *ngIf="!isCustomerEnabled()" class="bg-[#ffffff99] rounded-[10px] py-1 px-3 flex items-center justify-between mb-1">
+                <h1 class="text-center my-2">Important</h1>
+                <div class="flex items-center justify-center">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" [(ngModel)]="message_important" class="sr-only peer">
+                        <div class="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 dark:peer-focus:ring-[#E30039] rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-[#E30039]"></div>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div #messageContainer 
+            [ngClass]="{'h-[76%]': !isCustomerEnabled(), 'h-[90%]': isCustomerEnabled()}"
+            class="px-2 overflow-y-scroll custom-scrollbar flex flex-col space-y-2">
+            <div *ngFor="let message of messages" class="flex">
+                <div class="flex w-[100%]" *ngIf="message.message_public || (!message.message_public && (!isCustomerEnabled() || message.user_uuid === getUserUuid))">
+                    <div
+                        [ngClass]="{
+                            'bg-green-300': message.important,
+                            'bg-[#95A49A]': message.support_type_id === 1, 
+                            'bg-[rgb(37,211,102)]': message.support_type_id === 4, 
+                            'bg-[#ffffff]': message.support_type_id === 3
+                        }" 
+                        class="cursor-pointer rounded-[10px] message-content"
+                        (dblclick)="onDoubleClick(message)"
+                    >
+                        <p class="text-xs font-semibold"> {{ message.message_created_date | date:'yyyy MMM dd HH:mm:ss' }} </p>
+                        <p
+                            [ngClass]="{
+                                'text-custom': message.message_public === false
+                            }" 
+                        > {{ message.message_text }} </p>
+                    </div>
+                    <ng-container *ngIf="message.support_type_id === 1 || message.support_type_id === 4; else circle">
+                        <img alt="" [src]="getImageSource(message.support_type_id)" class="w-7 h-7 mx-1 my-2" />
+                    </ng-container>
+                    <ng-template #circle>
+                        <div class="relative" (mouseleave)="isHovered = false" (mouseenter)="isHovered = true && idMessage = message.message_id">
+                            <div class="rounded-full bg-white text-black border border-black w-7 h-7 mx-1 my-2 flex justify-center items-center text-[10px]">
+                                <h1><span>{{ message.User.user_first_name.charAt(0) }}{{ message.User.user_name.charAt(0) }}{{ message.User.user_name.charAt(message.User.user_name.length - 1) }}</span></h1>
+                            </div>
+                            <div class="z-50 absolute top-10 right-0 w-max p-1 bg-white text-black text-[9px] rounded-md border border-solid border-black" *ngIf="isHovered && message.message_id == idMessage">
+                                <div> Mail: {{ message.User.user_email }} </div>
+                                <div class="text-[8px]">
+                                    <div> Name: {{ message.User.user_first_name }} {{ message.User.user_name }} </div>
+                                    <div> Phone: {{ message.User.user_phone }} </div>
+                                </div>
+                            </div>
+                        </div>    
+                    </ng-template>    
+                </div>
+            </div>
+        </div>
+        <div class="flex mx-2 mt-1 relative bg-white rounded-[10px]">
+            <textarea [(ngModel)]="newMessage" placeholder="Text..." 
+                class="text-black w-[90%] rounded-[10px] py-2 px-4 resize-none overflow-y-scroll custom-scrollbar" 
+                [rows]="newMessage.split('\n').length" 
+                (keyup.enter)="sendMessage()"
+            ></textarea>  
+            <button
+                (click)="sendMessage()"
+            >
+                <img 
+                    src="assets/icons/send.png" 
+                    class="h-4 w-5 absolute top-1/2 transform -translate-y-1/2 right-2"
+                />
+            </button> 
+        </div>            
+    </div>
+</div>
+
+<div *ngIf="isDeleteMessageVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isDeleteMessageVisible" class="font-bold absolute top-1/3 left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-[#E30039] bg-white z-50 py-2 shadow-lg ">
+    <div class="flex justify-between px-4 py-1">
+        <div></div>
+        <div><h1 class="font-bold mb-1">Delete message</h1></div>
+        <div>
+            <img
+                (click)="toggleDeleteMessage()"
+                alt="Icon close"
+                src="assets/icons/close.png"
+                class="w-4 h-4 cursor-pointer"
+            />
+        </div>
+    </div>   
+
+    <div class="px-2">
+        <hr class="px-2 border border-dashed border-gray-600">
+        <h2 class="text-sm text-center mt-4">Etes-vous sur de vouloir supprimer le message?</h2>
+    </div>
+       
+    <div class="flex justify-between px-6 py-8">
+        <button class="rounded-[10px] mr-6 bg-gray-400 text-black font-bold shadow-lg py-4 px-6" (click)="toggleDeleteMessage()">Cancel</button>
+        <button class="rounded-[10px] mr-6 bg-custom text-black font-bold shadow-lg py-4 px-6" (click)="deleteMsg()">Delete</button>
+    </div>
+</div>

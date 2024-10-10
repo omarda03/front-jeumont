@@ -1,0 +1,25 @@
+<ng-container *ngIf="data && data.asked_created_date">
+    <!-- PRFS -->
+    <div *ngIf="data.type_asked === 'PRFS'">
+        <app-ticket-prfs 
+            [askedCreateDate]="data.asked_created_date" 
+            [idAsked]="data.asked_uuid"
+        ></app-ticket-prfs>
+    </div>
+
+    <!-- PRFM -->
+    <div *ngIf="data.type_asked === 'PRFM'">
+        <app-ticket-prfm 
+            [askedCreateDate]="data.asked_created_date" 
+            [idAsked]="data.asked_uuid"
+        ></app-ticket-prfm>
+    </div>
+
+    <!-- PRMA -->
+    <div *ngIf="data.type_asked === 'PRMA'">
+        <app-ticket-prmp
+            [askedCreateDate]="data.asked_created_date" 
+            [idAsked]="data.asked_uuid"
+        ></app-ticket-prmp>
+    </div>
+</ng-container>

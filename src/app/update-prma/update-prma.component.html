@@ -1,0 +1,777 @@
+<div *ngIf="isLoadingPage; else pageUpdate" class="flex items-center justify-center h-full bg-white">
+    <svg class="animate-spin h-5 w-5 mr-3 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.878 3.2 8.062l2.83-2.83zM12 20c-3.042 0-5.878-1.135-8.062-3.2l-2.83 2.83A7.962 7.962 0 0012 24h.001c4.418 0 8-3.582 8-8V12h-4v8z"></path>
+    </svg>
+    <p class="text-gray-600">Loading tickets...</p>
+</div>
+<ng-template #pageUpdate>
+    <div *ngIf="asked" class="text-sm font-inter mx-2 py-4 bg-[#D9D9D9] grid grid-cols-4">
+        <div class="col-span-1 mx-4">
+            <div>
+                <div class="flex justify-around my-1">
+                    <h2 class=" bg-[#F5F5F5] w-1/2 py-1 px-2 rounded-l-[10px]">Status</h2>
+                    <h2 class="flex justify-between items-center text-black bg-custom w-1/2 py-1 px-2 rounded-r-[10px]" [ngStyle]="{ 'background-color': 'rgba(' + getColorRGB(asked.Status.status_color) + ', 0.6)' }">
+                        <h3>{{ asked.Status.status_label }}</h3>
+                    </h2>
+                    <button
+                        (click) = "toggleStatus()"
+                        *ngIf="!isCustomerEnabled()"
+                    >
+                        <img                                        
+                            src="assets/icons/update.png"
+                            [ngClass]="updateStatus ? 'bg-custom p-2 rounded-md w-8 h-8 ml-2':'bg-[#F5F5F5] p-2 rounded-md w-8 h-8 ml-2'"
+                        >
+                    </button>
+                </div>
+                <div *ngIf="updateStatus" class="my-1">
+                    <select 
+                        [(ngModel)]="asked.status_id"
+                        class="bg-[#F5F5F5] mb-2 px-3 py-1 rounded-[10px] w-full">
+                        <!--
+                            <option value="0">None</option>
+                        -->
+                        <ng-container *ngFor="let status of allStatus">
+                            <option *ngIf="status.status_id !== 6" [value]="status.status_id" [disabled]="status.status_id === 5 && !enableResolved()">
+                                {{ status.status_label }}
+                            </option>
+                        </ng-container>
+                    </select>
+                </div>
+            </div>         
+            <div class="mt-6 border-t border-dashed border-black py-2">
+                <div class="flex items-center justify-center">
+                    <div class="flex flex-col items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 40 40" fill="none">
+                            <circle cx="20" cy="20" r="19.5" fill="#E30039" stroke="black"/>
+                            <circle cx="19.7889" cy="16.4115" r="7.46667" fill="#E30039" stroke="black"/>
+                            <path d="M6.48828 35.1999C6.98087 30.9689 10.0349 22.8875 18.3105 24.4107" stroke="black"/>
+                            <path d="M33.5117 35.1999C33.0191 30.9689 29.9651 22.8875 21.6895 24.4107" stroke="black"/>
+                            <rect x="17.0444" y="24.2222" width="5.48889" height="1.102" fill="black"/>
+                        </svg>
+                        <h2 class="font-semibold text-[12px]">Person in charge</h2>
+                    </div>
+                    <div *ngIf="!isCustomerEnabled() && !isSalesSupportDisabled() && disableAskedWhereClose()" class="ml-1">
+                        <img *ngIf="!addUserOnCharge" (click)="toggleAddUserOnCall()" class="cursor-pointer w-4 h-4" src="assets/icons/plus.png" />
+                        <img *ngIf="addUserOnCharge" (click)="toggleAddUserOnCall()" class="cursor-pointer w-4 h-4" src="assets/icons/minus.png" />
+                    </div>
+                </div>
+                <div class="flex justify-between items-center py-4 px-4 border-b border-dashed border-black">
+                    <div class="flex justify-center items-center mb-3">
+                        <div>
+                            <div class="flex justify-center items-center">
+                                <div *ngFor="let oncall of onCallsWeek">
+                                    <div class="relative" (mouseleave)="isHoveredButton = false && userMail = ''" (mouseenter)="isHoveredButton = true && userMail = oncall.user_email">
+                                        <div class="w-7 h-7 mr-1 text-[10px] rounded-full border border-solid border-black m-[1px] flex justify-center items-center"
+                                            [ngClass]="{
+                                                'bg-[#E3D617]': oncall.skill_id === 1,
+                                                'bg-[#17AFE3]': oncall.skill_id === 2,
+                                                'bg-[#7DC37D]': oncall.skill_id === 3,
+                                                'bg-[#D3D3D3]': oncall.skill_id !== 1 && oncall.skill_id !== 2 && oncall.skill_id !== 3
+                                            }">
+                                            <h1><span>{{ oncall.user_first_name.charAt(0) }}{{ oncall.user_name.charAt(0) }}{{ oncall.user_name.charAt(oncall.user_name.length - 1) }}</span></h1>
+                                        </div>
+                                        <div class="z-50 absolute top-8 left-0 w-max p-1 bg-white text-black text-[9px] rounded-md border border-solid border-black" 
+                                            *ngIf="isHoveredButton && userMail == oncall.user_email">
+                                            <div *ngIf="!isCustomerEnabled()"> Mail: {{ oncall.user_email }} </div>
+                                            <div class="text-[8px]">
+                                                <div> Name: {{ oncall.user_first_name }} {{ oncall.user_name }} </div>
+                                                <div *ngIf="!isCustomerEnabled()"> Phone: {{ oncall.user_phone }} </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="onCallsWeek && onCallsWeek.length === 0">
+                                <p class="text-xs font-semibold text-custom">There are no supports.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="addUserOnCharge" class="border-b border-dashed border-black">
+                    <div class="py-2 flex flex-col justify-center items-center">
+                        <h1>Email :</h1>
+                        <div class="relative py-2">
+                            <input
+                                [(ngModel)]="userEmail"
+                                (input)="onInputChange()"
+                                type="email"
+                                placeholder="email@jeumontelectric.com"
+                                class="p-1 font-normal border border-solid border-[#E30039] relative"
+                            />
+                            <div class="z-50 absolute top-full left-0 h-[150px] w-[210px] custom-scrollbar p-1 shadow-md overflow-y-scroll bg-white" *ngIf="suggestions.length > 0">
+                                <ul>
+                                    <li class="py-1 cursor-pointer" *ngFor="let suggestion of suggestions" (click)="selectSuggestionPrim(suggestion.user_email, suggestion.user_uuid)">
+                                        {{ suggestion.user_email }}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <button (click)="createAskedUser()" class="flex justify-center bg-custom py-2 px-4 text-white border border-solid border-black rounded-[10px]">
+                            Add user in charge
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!--
+                <div class="mt-6 border-t border-dashed border-black py-2">
+                    <div class="border-b border-dashed border-black">
+                        <div class="py-2 flex flex-col justify-center items-center">
+                            <h1 class="page-title">Email :</h1>
+                            <div class="relative py-2">
+                                <input
+                                    [(ngModel)]="userEmail"
+                                    (input)="onInputChange()"
+                                    type="email"
+                                    placeholder="email@jeumontelectric.com"
+                                    class="p-1 font-normal border border-solid border-[#E30039] relative w-[17rem]"
+                                />
+                                <div class="z-50 absolute top-full left-0 h-[10rem] w-[17rem] custom-scrollbar p-1 shadow-md overflow-y-scroll bg-white" *ngIf="suggestions.length > 0">
+                                    <ul>
+                                        <li class="py-1 cursor-pointer" *ngFor="let suggestion of suggestions" (click)="selectSuggestion(suggestion.user_email, suggestion.user_uuid)">
+                                            {{ suggestion.user_email }}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <button (click)="taggeUser()" class="flex justify-center bg-custom py-2 px-4 text-white border border-solid border-black rounded-[10px]">
+                                Tagge user
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            -->
+            <div  class="mb-6 border-b border-dashed border-black py-2">
+                <div class="flex-container-column">
+                    <h1 class="page-title">PRFS :</h1>
+                    <select [(ngModel)]="asked.prfs_link" class="creation-item-select my-2">
+                        <!--
+                            <option value="">None</option>
+                        -->
+                        <option *ngFor="let prfs of prfss" [value]="prfs.asked_uuid">{{ prfs.asked_ref }}</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <table class="table-update-prma">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Title</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngIf="!isCustomerEnabled()">
+                            <td>1</td>
+                            <td>Offre Recu ( PJ obligatoire )</td>
+                            <td>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" [(ngModel)]="asked.offer_received" class="sr-only peer">
+                                    <div class="checkbox-background"></div>
+                                </label>                            
+                            </td>
+                        </tr>
+                        <tr *ngIf="!isCustomerEnabled()">
+                            <td>2</td>
+                            <td>Demande de devis fournisseur</td>
+                            <td>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox"  [disabled]="!isPreviousElementTrue('quote_sent_to_supplier')" [(ngModel)]="asked.quote_sent_to_supplier" class="sr-only peer">
+                                    <div class="checkbox-background"></div>
+                                </label>                            
+                            </td>
+                        </tr>
+                        <tr *ngIf="!isCustomerEnabled()">
+                            <td>3</td>
+                            <td>Devis fournisseur recu</td>
+                            <td>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox"  [disabled]="!isPreviousElementTrue('quote_received_from_supplier')" [(ngModel)]="asked.quote_received_from_supplier" class="sr-only peer">
+                                    <div class="checkbox-background"></div>
+                                </label>                            
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Offre envoye</td>
+                            <td>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox"  [disabled]="!isPreviousElementTrue('offre_sent')" [(ngModel)]="asked.offre_sent" class="sr-only peer">
+                                    <div class="checkbox-background"></div>
+                                </label>                            
+                            </td>
+                        </tr>
+                        <tr *ngIf="!isCustomerEnabled()">
+                            <td>5</td>
+                            <td>Reponse client</td>
+                            <td>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" [disabled]="!isPreviousElementTrue('customer_response')" [(ngModel)]="asked.customer_response" class="sr-only peer">
+                                    <div class="checkbox-background"></div>
+                                </label>                            
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>PO Recu ( PJ obligatoire )</td>
+                            <td>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" [disabled]="!isPreviousElementTrue('recovery_of_purchase_orders')" [(ngModel)]="asked.recovery_of_purchase_orders" class="sr-only peer">
+                                    <div class="checkbox-background"></div>
+                                </label>                            
+                            </td>
+                        </tr>
+                        <tr *ngIf="!isCustomerEnabled()">
+                            <td>7</td>
+                            <td>Creation OEI ( PJ obligatoire)</td>
+                            <td>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" [disabled]="!isPreviousElementTrue('creation_of_the_project')" [(ngModel)]="asked.creation_of_the_project" class="sr-only peer">
+                                    <div class="checkbox-background"></div>
+                                </label>                            
+                            </td>
+                        </tr>
+                        <tr *ngIf="!isCustomerEnabled()">
+                            <td>8</td>
+                            <td>Creation DA</td>
+                            <td>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" [disabled]="!isPreviousElementTrue('creation_of_the_purchase_request')" [(ngModel)]="asked.creation_of_the_purchase_request" class="sr-only peer">
+                                    <div class="checkbox-background"></div>
+                                </label>                            
+                            </td>
+                        </tr>
+                        <tr *ngIf="!isCustomerEnabled()">
+                            <td>9</td>
+                            <td>Liberation DA</td>
+                            <td>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" [disabled]="!isPreviousElementTrue('release_of_purchase_requisition')" [(ngModel)]="asked.release_of_purchase_requisition" class="sr-only peer">
+                                    <div class="checkbox-background"></div>
+                                </label>                            
+                            </td>
+                        </tr>
+                        <tr *ngIf="!isCustomerEnabled()">
+                            <td>10</td>
+                            <td>Creation DA</td>
+                            <td>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" [disabled]="!isPreviousElementTrue('creating_the_purchase_order')" [(ngModel)]="asked.creating_the_purchase_order" class="sr-only peer">
+                                    <div class="checkbox-background"></div>
+                                </label>                            
+                            </td>
+                        </tr>
+                        <tr *ngIf="!isCustomerEnabled()">
+                            <td>11</td>
+                            <td>Reception materiel</td>
+                            <td>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" [disabled]="!isPreviousElementTrue('material_reception')" [(ngModel)]="asked.material_reception" class="sr-only peer">
+                                    <div class="checkbox-background"></div>
+                                </label>                            
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>12</td>
+                            <td>Mise a disposition</td>
+                            <td>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" [disabled]="!isPreviousElementTrue('provisionning_jeumont')" [(ngModel)]="asked.provisionning_jeumont" class="sr-only peer">
+                                    <div class="checkbox-background"></div>
+                                </label>                            
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>13</td>
+                            <td>Materiel envoyee ( PJ obligatoire )</td>
+                            <td>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" [disabled]="!isPreviousElementTrue('material_sent')" [(ngModel)]="asked.material_sent" class="sr-only peer">
+                                    <div class="checkbox-background"></div>
+                                </label>                            
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>14</td>
+                            <td>Facture envoyee</td>
+                            <td>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" [disabled]="!isPreviousElementTrue('bill_sent')" [(ngModel)]="asked.bill_sent" class="sr-only peer">
+                                    <div class="checkbox-background"></div>
+                                </label>                            
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>15</td>
+                            <td>Matériel reçu</td>
+                            <td>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" [disabled]="!isPreviousElementTrue('material_received')" [(ngModel)]="asked.material_received" class="sr-only peer">
+                                    <div class="checkbox-background"></div>
+                                </label>                            
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-[#F5F5F5] mt-6 rounded-[10px] p-2">
+                <div class="flex justify-between items-center">
+                    <div class="w-2 h-2 bg-custom rounded-full shadow-md shadow-black"></div>
+                    <div>
+                        <h1 class="font-bold text-base">Action lists</h1>
+                    </div>
+                    <div>
+                        
+                    </div>
+                </div>
+                <div class="h-[115px] overflow-y-scroll custom-scrollbar">
+                    <div *ngFor="let log of askedLogByAsked" class="flex items-center justify-between">
+                        <h4 class="text-[10px] font-normal text-left"><span class="font-bold">{{log.asked_log_text}}</span>, By <span class="font-bold">{{log.User.user_name.charAt(0)}}{{ log.User.user_first_name.charAt(0) }}{{ log.User.user_first_name.charAt(1) }}</span></h4>
+                        <h4 class="text-[10px] font-normal text-left px-2">{{ log.asked_log_created_date | date:'dd MMM yyyy HH:mm:ss' }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-span-2 border-x border-dashed border-black px-2">
+            <div class="flex justify-between items-center py-4 px-4 border-b border-dashed border-black">
+                <div class="flex items-center justify-between">
+                    <img src="assets/icons/user.png" alt="" class="w-6 h-6" />
+                    <h5 class="ml-2 font-bold text-base">{{ asked?.Ship?.Fleet?.Customer?.customer_name }}</h5>
+                </div>
+                <div class="flex items-center justify-between">
+                    <img src="assets/icons/ship.png" alt="" class="w-8 h-4" />
+                    <h5 class="ml-2 font-bold text-base">{{ asked?.Ship?.ship_name }}</h5>
+                </div>
+                <div class="text-left mt-1 text-[11px]">
+                    <h5>Creation: <span>{{ asked.asked_created_date | date:'dd MMM yyyy HH:mm:ss' }}</span></h5>
+                    <h5 *ngIf="asked.asked_updated_date">Update: <span>{{ asked.asked_updated_date | date:'dd MMM yyyy HH:mm:ss' }}</span></h5>
+                </div>
+            </div>
+            <div class="my-2">
+                <div class="mb-2">
+                    <p *ngIf="isCustomerEnabled()" class="text-base font-bold flex items-center">Description</p>
+                    <button     
+                        *ngIf="!isCustomerEnabled()"
+                        class="text-base font-bold flex items-center" 
+                        (click)="toggleUpdateDescription()"
+                    >
+                        Description
+                        <img
+                            src="assets/icons/update.png"
+                            [ngClass]="updateDescription ? 'bg-custom p-2 rounded-md w-8 h-8 ml-2':'bg-[#F5F5F5] p-2 rounded-md w-8 h-8 ml-2'"
+                        >
+                    </button>
+                    <textarea *ngIf="!updateDescription"  class="bg-[#F5F5F5] w-[100%] p-1 h-[60px] my-2">{{asked.asked_description}}</textarea>
+                    <textarea *ngIf="updateDescription"  [(ngModel)]="asked.asked_description" class=" w-[100%] bg-[#F5F5F5] p-1 h-[60px] my-2"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <div class="flex-container-between my-1">
+                            <h1 class="creation-title">Purchase request ID (CRM) :</h1>
+                            <p *ngIf="isCustomerEnabled()" class="creation-item-input-prma">{{asked.prma_id_crm}}</p>
+                            <input *ngIf="!isCustomerEnabled()" type="text" [(ngModel)]="asked.prma_id_crm" class="creation-item-input-prma" placeholder="purchase request id (CRM)" />
+                        </div>
+                        <div class="flex-container-between my-1">
+                            <h1 class="creation-title">Project number :</h1>
+                            <p *ngIf="isCustomerEnabled()" class="creation-item-input-prma">{{asked?.Project?.project_ref}}</p>
+                            <select *ngIf="!isCustomerEnabled()" [(ngModel)]="asked.prma_project_number" class="creation-item-input-prma">
+                                <!--
+                                    <option value="">None</option>
+                                -->
+                                <option *ngFor="let project of projects" [value]="project.project_uuid" >{{ project.project_ref }}</option>
+                            </select>
+                        </div>
+                        <div class="flex-container-between my-1">
+                            <h1 class="creation-title">Purchase order (PO) :</h1>
+                            <p *ngIf="isCustomerEnabled()" class="creation-item-input-prma">{{asked.prma_purchase_order_po}}</p>
+                            <input *ngIf="!isCustomerEnabled()" type="text" [(ngModel)]="asked.prma_purchase_order_po" placeholder="purchase order (PO)" class="creation-item-input-prma" />
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex-container-between my-1">
+                            <h1 class="creation-title">Purchase request date :</h1>
+                            <p *ngIf="isCustomerEnabled()" class="creation-item-input-prma">{{asked.prma_date | date:'yyyy MMM dd HH:mm:ss' }}</p>
+                            <input *ngIf="!isCustomerEnabled()" type="date" [(ngModel)]="asked.prma_date" [valueAsDate]="formatDate(asked.prma_date)" class="creation-item-input-prma" />
+                        </div>
+                        <div class="flex-container-between my-1">
+                            <h1 class="creation-title">Quotation price total :</h1>
+                            <p *ngIf="isCustomerEnabled()" class="creation-item-input-prma">{{asked.prma_quotation_price_total}}</p>
+                            <input *ngIf="!isCustomerEnabled()" type="text" [(ngModel)]="asked.prma_quotation_price_total" placeholder="quotation price total" class="creation-item-input-prma" />
+                        </div>
+                        <div class="flex-container-between my-1">
+                            <h1 class="creation-title">Requested delivery date:</h1>
+                            <p *ngIf="isCustomerEnabled()" class="creation-item-input-prma">{{asked.prma_desired_delivery_date | date:'yyyy MMM dd HH:mm:ss' }}</p>
+                            <input *ngIf="!isCustomerEnabled()" type="date" [(ngModel)]="asked.prma_desired_delivery_date" [valueAsDate]="formatDate(asked.prma_desired_delivery_date)" class="creation-item-input-prma" />
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="">
+                        <div class="flex items-center justify-around">
+                            <h1 class="page-title">Spare parts ( {{ spare_parts.length + spare_parts_database.length  }} )</h1>
+                            <h1 class="page-title">Purchase order ( CA )</h1>
+                        </div>
+                        <div class="bg-[#cc4264] border-solid border-red-600 flex flex-col items-center overflow-y-scroll h-[14rem] p-[.5rem] custom-scrollbar">
+                            <div *ngFor="let sparepart of spare_parts_database" class="w-[100%] bg-[#e4738f] p-[.5rem] mb-1 flex-container-center">
+                                <button (click)="deleteSparePartDatabase(sparepart.prma_eqp_internal_ref)">
+                                    <img
+                                        src="assets/icons/minus.png"
+                                        class="header-buttons-item-logo"
+                                    />
+                                </button>
+                                <div class="mx-2">
+                                    <div class="flex-container-between my-1">
+                                        <h1 class="creation-title mr-2">Spare :</h1>
+                                        <h2 class="creation-title-content text-white">{{ sparepart.EquipementInterne.piece_label }}</h2>
+                                    </div>
+                                    <div class="flex-container-between my-1">
+                                        <h1 class="creation-title mr-2">Quantity :</h1>
+                                        <h2 class="creation-title-content text-white">{{ sparepart.quantity}}</h2>
+                                    </div>
+                                </div>
+                                <div class="container-creation">
+                                    <div class="flex-container-between my-1">
+                                        <h1 class="creation-title mr-2">Purchase order number :</h1>
+                                        <h2 class="creation-title-content">{{ sparepart.purchase_order_number }}</h2>
+                                    </div>
+                                    <div class="flex-container-between my-1">
+                                        <h1 class="creation-title mr-2">Expected date :</h1>
+                                        <h2 class="creation-title-content">{{ sparepart.expected_date  | date:'dd MMM yyyy HH:mm:ss' }}</h2>
+                                    </div>
+                                    <div class="flex-container-between my-1">
+                                        <h1 class="creation-title mr-2">Status CA :</h1>
+                                        <h2 class="creation-title-content">{{ sparepart.status_ifs }}</h2>
+                                    </div>
+                                </div>
+                            </div>                        
+                            <div *ngFor="let sparepart of spare_parts; let i = index" class="w-[100%] bg-[#e4738f] p-[.5rem] mb-1 flex-container-center">
+                                <button (click)="deleteSparePart(i)">
+                                    <img src="assets/icons/minus.png" class="header-buttons-item-logo" />
+                                </button>
+                                <div class="mx-2">
+                                    <div class="flex-container-between my-1">
+                                        <h1 class="creation-title mr-2">Spare :</h1>
+                                        <h2 class="creation-title-content text-white">{{ sparepart.piece.piece_ifs }} ({{ sparepart.piece.piece_ref }}) -{{ sparepart.piece.piece_label }}</h2>
+                                    </div>
+                                    <div class="flex-container-between my-1">
+                                        <h1 class="creation-title mr-2">Quantity :</h1>
+                                        <h2 class="creation-title-content text-white">{{ sparepart.quantity}}</h2>
+                                    </div>
+                                </div>
+                                <div class="container-creation">
+                                    <div class="flex-container-between my-1">
+                                        <h1 class="creation-title mr-2">Purchase order number :</h1>
+                                        <h2 class="creation-title-content">{{ sparepart.purchase_order_number }}</h2>
+                                    </div>
+                                    <div class="flex-container-between my-1">
+                                        <h1 class="creation-title mr-2">Expected date :</h1>
+                                        <h2 class="creation-title-content">{{ sparepart.expected_date | date:'dd MMM yyyy HH:mm:ss' }}</h2>
+                                    </div>
+                                    <div class="flex-container-between my-1">
+                                        <h1 class="creation-title mr-2">Status CA :</h1>
+                                        <h2 class="creation-title-content">{{ sparepart.status_ifs }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="!isCustomerEnabled()" class="w-[100%] bg-[#e4738f] p-[.5rem] mb-1 flex-container-center">
+                                <div class="mx-2">
+                                    <div class="flex-container-between my-1">
+                                        <h1 class="creation-title mr-2">Spare :</h1>
+                                        <select [(ngModel)]="piece_uuid" [ngModelOptions]="{standalone: true}" class="creation-item-select-prma">
+                                            <!--
+                                                <option value="">None</option>
+                                            -->
+                                            <option *ngFor="let piece of equipementsinterne" [value]="piece.piece_uuid" >{{ piece.piece_ifs }} ({{ piece.piece_ref }}) - {{ piece.piece_label }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex-container-between my-1">
+                                        <h1 class="creation-title mr-2">Quantity :</h1>
+                                        <input type="number" [(ngModel)]="quantity" [ngModelOptions]="{standalone: true}" class="creation-item-input-prma" />
+                                    </div>
+                                </div>
+                                <div class="container-creation">
+                                    <div class="flex-container-between my-1">
+                                        <h1 class="creation-title mr-2">Purchase order number :</h1>
+                                        <input type="text" [(ngModel)]="purchase_order_number" [ngModelOptions]="{standalone: true}" placeholder="purchase order number" class="creation-item-input-prma" />
+                                    </div>
+                                    <div class="flex-container-between my-1">
+                                        <h1 class="creation-title mr-2">Expected date :</h1>
+                                        <input type="date" [(ngModel)]="expected_date" [valueAsDate]="formatDate(expected_date)" [ngModelOptions]="{standalone: true}" class="creation-item-input-prma" />
+                                    </div>
+                                    <div class="flex-container-between my-1">
+                                        <h1 class="creation-title mr-2">Status CA :</h1>
+                                        <input type="text" [(ngModel)]="status_ifs" [ngModelOptions]="{standalone: true}" placeholder="status CA" class="creation-item-input-prma" />
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="flex justify-center items-center" *ngIf="!isCustomerEnabled()">
+                                <img (click)="addToSpareParts()" src="assets/icons/plus.png" class="header-buttons-item-logo mt-2" />
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex-container-column">
+                        <h1 class="page-title">Purchase request ( DA )</h1>
+                        <div class="container-creation w-[100%]">
+                            <div class="flex-container-between my-1">
+                                <h1 class="creation-title mr-4">Purchase request number :</h1>
+                                <p *ngIf="isCustomerEnabled()" class="creation-item-input-prma">{{asked.prma_number_da}}</p>
+                                <input *ngIf="!isCustomerEnabled()" type="text" [(ngModel)]="asked.prma_number_da" placeholder="purchase request number" class="creation-item-input-prma" />
+                            </div>
+                            <div class="flex-container-between my-1">
+                                <h1 class="creation-title mr-4">Release date DA :</h1>
+                                <p *ngIf="isCustomerEnabled()" class="creation-item-input-prma">{{asked.prma_release_date_da | date:'yyyy MMM dd HH:mm:ss' }}</p>
+                                <input *ngIf="!isCustomerEnabled()" type="date"[(ngModel)]="asked.prma_release_date_da" [valueAsDate]="formatDate(asked.prma_release_date_da)" class="creation-item-select-prma" />
+                            </div>
+                        </div>
+                    </div>
+    
+                </div>
+                <div 
+                    class="border-style justify-around py-2"
+                    (dragover)="onDragOver($event)"
+                    (drop)="onDrop($event)"
+                >
+                    <div class="bg-[#ffffff99] h-auto py-2 px-2 rounded-[10px] mb-2 grid grid-cols-2">
+                        <div class="bg-[#D9D9D9] p-2 mx-2 rounded-[10px] h-[90px] overflow-y-scroll custom-scrollbar">   
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-sm text-[#00000059] px-2">Name</th>
+                                        <th class="text-sm text-[#00000059] px-2">Size</th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let att of attachements">
+                                        <td class="text-[9px] lowercase">
+                                            {{ att.doc_last_version }}
+                                        </td>
+                                        <td class="text-[9px]">
+                                            {{ (att.doc_size / (1024 * 1024)) | number: '1.2-2' }} Mo
+                                        </td>
+                                        <td>
+                                            <div class="flex justify-center items-center">
+                                                <img
+                                                    src="assets/icons/download.png"
+                                                    (click)="downloadFile(att.doc_url)"
+                                                    class="w-4 h-4 ml-1 cursor-pointer"
+                                                />
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="flex justify-center items-center">
+                                                <button (click)="toggleDeleteFileTicket(att)" class="ml-2 text-red-500">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        class="w-4 h-4"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="currentColor"
+                                                    >
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                
+                                    <tr *ngFor="let file of files">
+                                        <td class="text-[9px] lowercase">
+                                            {{ file.name }}
+                                        </td>
+                                        <td class="text-[9px]">
+                                            {{ file.size }} 
+                                        </td>
+                                        <td>
+                                            <div class="flex justify-center items-center">
+                                                <a [href]="file.path" class="flex flex-col items-center" download="{{ getFileNameWithoutExtension(file.name) }}">
+                                                    <img src="assets/icons/download.png" class="w-4 h-4 ml-2 cursor-pointer" />
+                                                </a>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="flex justify-center items-center">
+                                                <button (click)="toggleDeleteFileToDownloadTicket(file)" class="ml-2 text-red-500">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        class="w-4 h-4"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="currentColor"
+                                                    >
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>                                        
+                        </div>
+                        <div 
+                            (drop)="onDrop($event)"
+                            (dragover)="onDragOver($event)" 
+                            class="border border-dotted border-black p-2 rounded-[10px] text-[10px]"
+                        >
+                            <div class="flex justify-center">
+                                <label for="fileInput" class="font-semibold cursor-pointer text-center">Drag and drop</label>
+                            </div>
+                            <div class="flex items-center justify-between mx-16">
+                                <div class="flex-1 border-t-2 border-[#E30039]"></div>
+                                <h1 class="text-center text-base md:text-lg font-semibold px-2"> Or </h1>
+                                <div class="flex-1 border-t-2 border-[#E30039]"></div>
+                            </div>
+                            <div class="flex justify-center">
+                                <button (click)="toggleBrowsefiles()" class="rounded-[10px] bg-custom text-black py-1 px-8">Browse files</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <button 
+                    (click)="submitForm()" 
+                    class="button-save"
+                >
+                    <img
+                        src="assets/icons/save.png"
+                        alt=""
+                        class="mr-2"
+                    />
+                    Save
+                </button>
+                <button 
+                    (click)="cancel()"
+                    class="button-cancel"
+                >
+                    <img
+                        src="assets/icons/cancel.png"
+                        alt=""
+                        class="mr-2"
+                    />
+                    Cancel
+                </button>
+            </div>
+        </div>
+        <div class="col-span-1 px-2">
+            <app-chat [idAsked]="askedUuid"></app-chat>
+        </div>
+    </div>
+</ng-template>
+<app-popup *ngIf="isVisible" [popupText]="text"></app-popup>
+
+<div *ngIf="isDeleteFileTicketVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isDeleteFileTicketVisible" class="font-bold absolute top-1/3 left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-[#E30039] bg-white z-50 py-2 shadow-lg ">
+    <div class="flex justify-between px-4 py-1">
+        <div></div>
+        <div>
+            <h1 class="font-bold mb-1">Delete file</h1>
+        </div>
+        <div>
+            <img
+                (click)="cancelDeleteFile()"
+                alt="Icon close"
+                src="assets/icons/close.png"
+                class="w-4 h-4 cursor-pointer"
+            />
+        </div>
+    </div>   
+    <div class="px-2">
+        <hr class="px-2 border border-dashed border-gray-600">
+        <h2 class="text-sm text-center mt-4">Are you certain that you intended to delete this file?</h2>
+    </div>   
+    <div class="flex justify-between px-6 py-8">
+        <button class="rounded-[10px] px-8 py-2 border border-black font-bold shadow-lg" (click)="cancelDeleteFile()">Cancel</button>
+        <button class="rounded-[10px] bg-custom text-white font-bold shadow-lg py-2 px-8" (click)="clickDeleteFile()">Delete</button>
+    </div>
+</div>
+
+<div *ngIf="isDeleteFileToDownloadTicketVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isDeleteFileToDownloadTicketVisible" class="font-bold absolute top-1/3 left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-[#E30039] bg-white z-50 py-2 shadow-lg ">
+    <div class="flex justify-between px-4 py-1">
+        <div></div>
+        <div>
+            <h1 class="font-bold mb-1">Delete file</h1>
+        </div>
+        <div>
+            <img
+                (click)="cancelDeleteFileToDownload()"
+                alt="Icon close"
+                src="assets/icons/close.png"
+                class="w-4 h-4 cursor-pointer"
+            />
+        </div>
+    </div>   
+    <div class="px-2">
+        <hr class="px-2 border border-dashed border-gray-600">
+        <h2 class="text-sm text-center mt-4">Are you certain that you intended to delete this file?</h2>
+    </div>   
+    <div class="flex justify-between px-6 py-8">
+        <button class="rounded-[10px] px-8 py-2 border border-black font-bold shadow-lg" (click)="cancelDeleteFileToDownload()">Cancel</button>
+        <button class="rounded-[10px] bg-custom text-white font-bold shadow-lg py-2 px-8" (click)="clickDeleteFileToDownload()">Delete</button>
+    </div>
+</div>
+
+<div *ngIf="isBrowsefiles" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isBrowsefiles" class="font-bold absolute top-[2rem] left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-[#E30039] bg-white z-50 py-2 shadow-lg ">
+    <div class="flex justify-between px-4 py-1 border-dashed border-b-2">
+        <div></div>
+        <div>
+            <h1 class="font-bold mb-1">Browse files</h1>
+        </div>
+        <div>
+            <img
+                (click)="toggleBrowsefiles()"
+                alt="Icon close"
+                src="assets/icons/close.png"
+                class="w-4 h-4 cursor-pointer"
+            />
+        </div>
+    </div>   
+    <div class="px-6 flex flex-col py-8">
+        <div class="my-2">
+            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="OfferReceivedInput" (change)="onFileChange($event, 'Offer_Received')" multiple>
+            <label for="OfferReceivedInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Offer received</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="OfferSentInput" (change)="onFileChange($event, 'Offer_Sent')" multiple>
+            <label for="OfferSentInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Offer Sent</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="poInput" (change)="onFileChange($event, 'Purchase_Order')" multiple>
+            <label for="poInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Purchase Order</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="oeiInput" (change)="onFileChange($event, 'OEI')" multiple>
+            <label for="oeiInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Ordre d’execution interne</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="MaterialReceptionInput" (change)="onFileChange($event, 'Material_Reception')" multiple>
+            <label for="MaterialReceptionInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Material reception</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="ssInput" (change)="onFileChange($event, 'Shipping_Slips')" multiple>
+            <label for="ssInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Shipping slips</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="srInput" (change)="onFileChange($event, 'Receipt_Slip')" multiple>
+            <label for="srInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Receipt slip</h1>    
+            </label>
+        </div>
+    </div>
+</div>

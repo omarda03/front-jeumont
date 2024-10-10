@@ -1,0 +1,20 @@
+{
+    "welcome": "Bienvenue",
+    "french": "Français",
+    "english": "Anglais",
+    "language": "Sélection de la langue",
+    "preferred": "Sélectionnez votre langue préférée :",
+    "whichkindTicket": "Quel type de ticket souhaitez-vous créer ?",
+    "newTicket": "Nouveau ticket",
+    "createTicket": "Créer un ticket",
+    "statisticsTickets": "Statistiques des tickets",
+    "listingTickets": "Liste des tickets",
+    "searchDocument": "Recherche de documents",
+    "searchClient": "Recherche client",
+    "config": "Configuration et planning des astreintes",
+    "filter": "Filtre",
+    "export": "Exporter",
+    "sort": "Trier par",
+    "languageChange": "Changer de langue",
+    "dashboard": "Tableau de bord"
+}

@@ -1,0 +1,9 @@
+input {
+    outline: none; /* Remove the default focus outline */
+}
+
+.selected-customer {
+    background-color: #E30039;
+    padding: 4px;
+    color: white;
+}

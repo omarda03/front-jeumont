@@ -1,0 +1,19 @@
+<div class="container-page">
+    <div class="rounded-[1rem]">
+        <div class=" grid grid-cols-9 border border-solid border-black text-center rounded-t-[10px]">
+            <ng-container *ngFor="let route of configRoutes">
+                <a
+                    (click)="changeUrl()"
+                    [routerLink]="route.path"
+                    class="py-3 border-r border-solid border-black"
+                    [ngClass]="{'text-white bg-custom': currentRoute.includes(route.path)}"
+                >
+                    {{ route.label }}
+                </a>
+            </ng-container>
+        </div>
+        <div class="bg-[#EEE] rounded-b-[1rem] p-[1rem] overflow-y-hidded">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

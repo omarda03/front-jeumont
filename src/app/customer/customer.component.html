@@ -1,0 +1,125 @@
+<div class="container-page">
+    <div class="grid grid-cols-4 gap-6">
+        <div class="col-span-1">
+            <h2 class="text-center text-white bg-custom rounded-t-[10px] font-semibold text-xl py-2 ">Infos</h2>
+            <div class="bg-white rounded-b-[10px]">
+                <div *ngIf="isLoading; else infoCustomer"  class="flex items-center justify-center h-full bg-white">
+                    <svg class="animate-spin h-5 w-5 mr-3 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.878 3.2 8.062l2.83-2.83zM12 20c-3.042 0-5.878-1.135-8.062-3.2l-2.83 2.83A7.962 7.962 0 0012 24h.001c4.418 0 8-3.582 8-8V12h-4v8z"></path>
+                    </svg>
+                    <p class="text-gray-600">Loading infos...</p>
+                </div>
+                
+                <ng-template #infoCustomer>
+                    <div class="w-full">
+                        <div class="flex justify-center py-2">
+                            <img src="assets/icons/user.png" class="pr-2" />
+                            <h3 class="text-xl font-semibold">{{customer.customer_name}}</h3>
+                        </div>
+                        <div class="py-2 border-b border-solid border-gray-300">
+                            <div *ngFor="let fleet of fleets" class="flex items-center justify-center py-2">
+                                <img src="assets/icons/fleet.png" class="pr-2 w-16 h-6" />
+                                <h3 class="text-sm">{{ fleet.fleet_name }}</h3>
+                            </div>
+                        </div>
+                        <div class="py-2 border-b border-solid border-gray-300">
+                            <div *ngFor="let ship of ships" class="flex items-center justify-center py-1">
+                                <img src="assets/icons/ship.png" class="pr-2 w-14 h-4" />
+                                <h3 
+                                    class="text-sm cursor-pointer" 
+                                    (click)="shipDesc(ship)"
+                                    [ngClass]="{'bg-custom p-2 text-white font-semibold': ship.ship_name === shipName}"
+                                > {{ ship.ship_name }} </h3>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+        <div class="col-span-3">
+            <div class="flex items-center justify-around text-white bg-custom rounded-t-[10px] py-2">
+                <h2 class="cursor-pointer" (click)="setText('Documents related to client')">Documents related to client</h2>
+                <h2 class="cursor-pointer" (click)="setText('Boat information')">Ship information</h2>
+                <h2 class="cursor-pointer" (click)="setText('Messages des clients')">Messages des clients</h2>
+            </div>
+            <div *ngIf="text === 'Documents related to client'" class="bg-white h-[36rem]">
+                <table class="documents-table-t custom-scrollbar">
+                    <thead class="documents-thead">   
+                        <tr>
+                            <th class="documents-thead-element">Name</th>
+                            <th class="documents-thead-element">Ref</th>
+                            <th class="documents-thead-element">Type</th>
+                            <th class="documents-thead-element">Category</th>
+                            <th class="documents-thead-element">Created on</th>
+                            <th class="documents-thead-element">Size</th>
+                            <th class="documents-thead-element">Localisation</th>
+                        </tr>             
+                    </thead>
+                    <tbody class="documents-thead">
+                        <tr *ngFor="let document of documents" class="documents-tbody-tr">
+                            <td class="documents-tbody-element">{{ document.doc_last_version }}</td>
+                            <td class="documents-tbody-element">{{ document.doc_ref }}</td>
+                            <td class="documents-tbody-element">{{ document.doc_type }}</td>
+                            <td class="documents-tbody-element">{{ document.Categorie.cat_label }}</td>
+                            <td class="documents-tbody-element">{{ document.doc_created_date | date:'yyyy MMM dd HH:mm:ss' }}</td>
+                            <td class="documents-tbody-element">{{ document.doc_size }} o</td>                            
+                            <td class="flex items-center justify-center documents-tbody-element">
+                                <a class="page-attachements-drop-button mr-2" [href]="document.doc_localisation_numerique">Numerique</a>
+                            </td> 
+                        </tr>
+                    </tbody>
+                </table>
+                <div *ngIf="totalPages !== 1 && totalPages !== 0" class="pagination">
+                    <button (click)="changePage(-1)" class="pagination-button">Previous</button>
+        
+                    <ng-container *ngFor="let pageNumber of getPageNumbers(currentPage, totalPages)">
+                        <button *ngIf="pageNumber !== '...'" [class.active]="pageNumber === currentPage" (click)="goToPage(pageNumber)" class="pagination-button">{{ pageNumber }}</button>
+                        <span *ngIf="pageNumber === '...'">{{ pageNumber }}</span>
+                    </ng-container>
+        
+                    <input [(ngModel)]="currentPage" (keyup.enter)="goToPage(currentPage)" class="pagination-input" type="number" min="1" [max]="totalPages" />
+        
+                    <button (click)="changePage(1)" class="pagination-button">Next</button>
+                </div>
+            </div>
+            <div *ngIf="text === 'Boat information'" class="bg-white h-[36rem]">
+                <p class="px-4 py-2 text-sm">{{ shipDescription }}</p>
+            </div>
+            <div *ngIf="text === 'Messages des clients'" class="bg-white h-[36rem]">
+                <table class="documents-table-t custom-scrollbar">
+                    <thead class="documents-thead">   
+                        <tr>
+                            <th class="documents-thead-element">Message text</th>
+                            <th class="documents-thead-element">Support type</th>
+                            <th class="documents-thead-element">Message public</th>
+                            <th class="documents-thead-element">Created on</th>
+                        </tr>             
+                    </thead>
+                    <tbody class="documents-thead">
+                        <tr *ngFor="let message of messages" class="documents-tbody-tr">
+                            <td class="documents-tbody-element w-[20rem]">
+                                {{ message.message_text.split(' ').slice(0, 5).join(' ') + (message.message_text.split(' ').length > 5 ? '...' : '') }}
+                            </td>
+                            <td class="documents-tbody-element">{{ message.SupportType.support_type_label }}</td>
+                            <td class="documents-tbody-element">{{ message.message_public }}</td>
+                            <td class="documents-tbody-element">{{ message.message_created_date | date:'yyyy MMM dd HH:mm:ss' }}</td>
+                        </tr>
+                    </tbody>
+                </table>       
+                <div *ngIf="totalPagesMessage !== 1 && totalPagesMessage !== 0" class="pagination">
+                    <button (click)="changePageMessage(-1)" class="pagination-button">Previous</button>
+        
+                    <ng-container *ngFor="let pageNumber of getPageNumbers(currentPageMessage, totalPagesMessage)">
+                        <button *ngIf="pageNumber !== '...'" [class.active]="pageNumber === currentPageMessage" (click)="goToPageMessage(pageNumber)" class="pagination-button">{{ pageNumber }}</button>
+                        <span *ngIf="pageNumber === '...'">{{ pageNumber }}</span>
+                    </ng-container>
+        
+                    <input [(ngModel)]="currentPageMessage" (keyup.enter)="goToPageMessage(currentPage)" class="pagination-input" type="number" min="1" [max]="totalPages" />
+        
+                    <button (click)="changePageMessage(1)" class="pagination-button">Next</button>
+                </div> 
+            </div>
+        </div>
+    </div>
+</div>

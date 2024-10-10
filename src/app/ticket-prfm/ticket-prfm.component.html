@@ -1,0 +1,222 @@
+<ng-container *ngIf="data && data.Status">
+    <div
+        class="ticket"
+        *ngIf="!isExpanded"
+        [ngStyle]="{ 'background-color': 'rgb(' + getColorRGB(data.Status.status_id) + ', 0.5)' }"
+    >
+        <div class="ticket-left">
+            <div class="ticket-flex-center">
+                <div class="ticket-col-between overflow-x-auto overflow-y-auto custom-scrollbar">
+                    <div class="ticket-flex-center">
+                        <h1 class="ticket-title">{{ data.asked_ref }}</h1>
+                    </div>
+                    <div class="ticket-flex-center">
+                        <div>
+                            <h2 class="ticket-title-element text-left">{{ data?.Status?.status_label }}</h2>
+                            <div class="ticket-color" [style.backgroundColor]="data?.Status?.status_color"></div>
+                        </div>
+                        <div class="ml-1">
+                            <h5 class="ticket-title-element-date">Creation: <span class="ticket-title-element-date-gras">{{ data.asked_created_date | date:'dd MMM yyyy HH:mm:ss' }}</span></h5>
+                            <h5 class="ticket-title-element-date" *ngIf="data.asked_updated_date">Update: <span class="ticket-title-element-date-gras">{{ data.asked_updated_date | date:'dd MMM yyyy HH:mm:ss' }}</span></h5>
+                        </div>
+                    </div>
+                </div>
+
+                    <div class="ticket-col-between2">
+                        <p class="ticket-description2 overflow-x-hidden overflow-y-auto custom-scrollbar">
+                            {{ data.asked_description }}
+                        </p>
+                    </div>
+
+                <div class="ticket-col-between">
+                    <div class="ticket-flex-start">
+                        <img  class="border-solid" src="assets/icons/user.png" alt="user" class="logo-user" />
+                        <h5 class="ticket-title-element-gras">{{ data?.Ship?.Fleet?.Customer?.customer_name }}</h5>
+                    </div>
+                    <div class="ticket-flex-start">
+                        <img src="assets/icons/ship.png" alt="ship" class="logo-ships" />
+                        <h5 class="ticket-title-element-gras">{{ data?.Ship?.ship_name }}</h5>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="ticket-right">
+            <div class="ticket-flex-center">
+                <div class="ticket-col-between">
+                    <h2 class="ticket-title-element-gras" *ngIf="data.Piece">Item : <span class="ticket-title-element">{{ data.Piece.piece_label }}</span></h2>
+                    <h2 class="ticket-title-element-gras" *ngIf="data.Side">Side : <span class="ticket-title-element">{{ data.Side.side_label }}</span></h2>
+                </div>
+                <div class="flex justify-center items-center">
+                    <div *ngFor="let oncall of onCallsWeek" class="flex flex-col justify-center items-center" [ngClass]="{'flex': true}">
+                        <div class="relative" (mouseleave)="isHovered = false && userMail = ''" (mouseenter)="isHovered = true && userMail = oncall.user_email">
+                            <div class="mx-2 w-6 h-6 text-[10px] rounded-full border border-solid border-black m-[1px] flex justify-center items-center"
+                                [ngClass]="{
+                                    'bg-[#E3D617]': oncall.skill_id === 1,
+                                    'bg-[#17AFE3]': oncall.skill_id === 2,
+                                    'bg-[#7DC37D]': oncall.skill_id === 3,
+                                    'bg-[#D3D3D3]': oncall.skill_id !== 1 && oncall.skill_id !== 2 && oncall.skill_id !== 3
+                                }">
+                                <h1><span>{{ oncall.user_first_name.charAt(0) }}{{ oncall.user_name.charAt(0) }}{{ oncall.user_name.charAt(oncall.user_name.length - 1) }}</span></h1>
+                            </div>
+                            <div class="z-50 absolute -top-2 right-16 w-max p-1 bg-white text-black text-[9px] rounded-md border border-solid border-black"
+                                *ngIf="isHovered && userMail == oncall.user_email">
+                                <div *ngIf="!isCustomerEnabled()">Mail: {{ oncall.user_email }} </div>
+                                <div class="text-[8px]">
+                                    <div>Name: {{ oncall.user_first_name }} {{ oncall.user_name }}</div>
+                                    <div *ngIf="!isCustomerEnabled()">Phone: {{ oncall.user_phone }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative" (mouseleave)="isHovered = false && userMail = ''" (mouseenter)="isHovered = true && userMail = data.User.user_email">
+                        <div class="bg-[#D3D3D3] ml-2 w-6 h-6 text-[10px] rounded-full border border-solid border-black m-[1px] flex justify-center items-center">
+                            <h1><span>{{ data?.User?.user_first_name?.charAt(0) }}{{ data?.User?.user_name?.charAt(0) }}{{  data?.User?.user_name?.charAt( data?.User?.user_name?.length - 1) }}</span></h1>
+                        </div>
+                        <div class="z-50 absolute -top-2 right-16 w-max p-1 bg-white text-black text-[9px] rounded-md border border-solid border-black"
+                            *ngIf="isHovered && userMail == data.User.user_email">
+                            <div *ngIf="!isCustomerEnabled()">Mail: {{ data.User.user_email }} </div>
+                            <div class="text-[8px]">
+                                <div>Name: {{ data.User.user_first_name }} {{ data.User.user_name }}</div>
+                                <div>Phone: {{ data.User.user_phone }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="">
+                    <img
+                        src="assets/icons/polygon.png"
+                        (click)="toggleExpansion()"
+                        alt="close"
+                        class="ticket-close-icon cursor-pointer"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div
+        class="ticket-dev"
+        *ngIf="isExpanded"
+        [ngStyle]="{ 'background-color': 'rgb(' + getColorRGB(data.Status.status_id) + ', 0.5)' }"
+    >
+        <div class="ticket-flex-center border-b border-solid border-black pb-4">
+            <div class="ticket-col-between">
+                <div class="ticket-flex-center">
+                    <h1 class="ticket-title">{{ data.asked_ref }}</h1>
+                </div>
+                <div class="ticket-flex-center">
+                    <div>
+                        <h2 class="ticket-title-element text-left">{{ data?.Status?.status_label }}</h2>
+                        <div class="ticket-color" [style.backgroundColor]="data?.Status?.status_color"></div>
+                    </div>
+                    <div class="ml-1">
+                        <h5 class="ticket-title-element-date">Creation: <span class="ticket-title-element-date-gras">{{ data.asked_created_date | date:'dd MMM yyyy HH:mm:ss' }}</span></h5>
+                        <h5 class="ticket-title-element-date" *ngIf="data.asked_updated_date">Update: <span class="ticket-title-element-date-gras">{{ data.asked_updated_date | date:'dd MMM yyyy HH:mm:ss' }}</span></h5>
+                    </div>
+                </div>
+            </div>
+            <div class="ticket-col-between">
+                <div class="ticket-flex-start">
+                    <img src="assets/icons/user.png" alt="user" class="logo-user" />
+                    <h5 class="ticket-title-element-gras">{{ data?.Ship?.Fleet?.Customer?.customer_name }}</h5>
+                </div>
+                <div class="ticket-flex-start">
+                    <img src="assets/icons/ship.png" alt="ship" class="logo-ships" />
+                    <h5 class="ticket-title-element-gras">{{ data?.Ship?.ship_name }}</h5>
+                </div>
+            </div>
+            <div class="ticket-col-between">
+                <h2 class="ticket-title-element-gras" *ngIf="data.Piece">Item : <span class="ticket-title-element">{{ data.Piece.piece_label }}</span></h2>
+                <h2 class="ticket-title-element-gras" *ngIf="data.Side">Side : <span class="ticket-title-element">{{ data.Side.side_label }}</span></h2>
+                <h2 *ngIf="prfss" class="ticket-title-element-gras">Related PRFS :
+                    <span  *ngFor="let prfs of prfss" class="ticket-title-element">{{ prfs.asked_prfs_ref }},</span>
+                </h2>
+            </div>
+            <div class="ticket-col-between">
+                <button
+                    [routerLink]="shouldShowTitle() ? '/client/update/prfm/' + data.asked_uuid : '/update/prfm/' + data.asked_uuid"
+                    [style.backgroundColor]="'rgb(' + getColorRGB(data.Status.status_id) + ', 0.5)'"
+                    class="ticket-button"
+                >
+                    <img src="assets/icons/update.png" class="w-4 h-4 mr-2" />
+                    <ng-container *ngIf="shouldShowTitle(); else editButton"> Show </ng-container>
+                    <ng-template #editButton> Edit </ng-template>
+                </button>
+                <div class="flex justify-center items-center">
+                    <div *ngFor="let oncall of onCallsWeek" class="flex flex-col justify-center items-center" [ngClass]="{'flex': true}">
+                        <div class="relative" (mouseleave)="isHovered = false && userMail = ''" (mouseenter)="isHovered = true && userMail = oncall.user_email">
+                            <div class="mx-1 w-6 h-6 text-[10px] rounded-full border border-solid border-black m-[1px] flex justify-center items-center"
+                                [ngClass]="{
+                                    'bg-[#E3D617]': oncall.skill_id === 1,
+                                    'bg-[#17AFE3]': oncall.skill_id === 2,
+                                    'bg-[#7DC37D]': oncall.skill_id === 3,
+                                    'bg-[#D3D3D3]': oncall.skill_id !== 1 && oncall.skill_id !== 2 && oncall.skill_id !== 3
+                                }">
+                                <h1><span>{{ oncall.user_first_name.charAt(0) }}{{ oncall.user_name.charAt(0) }}{{ oncall.user_name.charAt(oncall.user_name.length - 1) }}</span></h1>
+                            </div>
+                            <div class="z-50 absolute -top-2 right-16 w-max p-1 bg-white text-black text-[9px] rounded-md border border-solid border-black"
+                                *ngIf="isHovered && userMail == oncall.user_email">
+                                <div *ngIf="!isCustomerEnabled()">Mail: {{ oncall.user_email }} </div>
+                                <div class="text-[8px]">
+                                    <div>Name: {{ oncall.user_first_name }} {{ oncall.user_name }}</div>
+                                    <div *ngIf="!isCustomerEnabled()">Phone: {{ oncall.user_phone }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative" (mouseleave)="isHovered = false && userMail = ''" (mouseenter)="isHovered = true && userMail = data.User.user_email">
+                        <div class="mx-1 w-6 h-6 text-[10px] rounded-full border border-solid border-black m-[1px] flex justify-center items-center"
+                            [ngClass]="{
+                                'bg-[#E3D617]': data.User.skill_id === 1,
+                                'bg-[#17AFE3]': data.User.skill_id === 2,
+                                'bg-[#7DC37D]': data.User.skill_id === 3,
+                                'bg-[#D3D3D3]': data.User.skill_id !== 1 && data.User.skill_id !== 2 && data.User.skill_id !== 3
+                            }">
+                            <h1><span>{{ data.User.user_first_name.charAt(0) }}{{ data.User.user_name.charAt(0) }}{{ data.User.user_name.charAt(data.User.user_name.length - 1) }}</span></h1>
+                        </div>
+                        <div class="z-50 absolute -top-2 right-16 w-max p-1 bg-white text-black text-[9px] rounded-md border border-solid border-black"
+                            *ngIf="isHovered && userMail == data.User.user_email">
+                            <div *ngIf="!isCustomerEnabled()">Mail: {{ data.User.user_email }} </div>
+                            <div class="text-[8px]">
+                                <div>Name: {{ data.User.user_first_name }} {{ data.User.user_name }}</div>
+                                <div>Phone: {{ data.User.user_phone }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end items-center cursor-pointer">
+                <img
+                    src="assets/icons/polygon.png"
+                    (click)="toggleExpansion()"
+                    alt="close"
+                    class="ticket-close-icon rotate-180 cursor-pointer"
+                />
+            </div>
+        </div>
+        <div class="ticket-flex-center pb-4">
+            <div class="">
+                <h1 class="ticket-title-element-gras">Description</h1>
+                <p [style.backgroundColor]="'rgba(' + getColorRGB(data.Status.status_color) + ', 0.5)'" class="ticket-descriptions overflow-x-hidden overflow-y-auto custom-scrollbar">
+                    {{ data.asked_description }}
+                </p>
+            </div>
+            <div class="">
+                <h1 class="ticket-title-element-gras">PRFM Resume</h1>
+                <p [style.backgroundColor]="'rgba(' + getColorRGB(data.Status.status_color) + ', 0.5)'" class="ticket-descriptions overflow-x-hidden overflow-y-auto custom-scrollbar">
+                    {{ data.prfm_resume }}
+                </p>
+            </div>
+            <div class="col-span-1 flex flex-col items-center">
+                <div *ngIf="attachements" class="flex flex-col items-center">
+                    <div *ngFor="let attachement of attachements" class="flex items-center mt-2">
+                        <p>{{ attachement.doc_last_version }}</p>
+                        <img src="assets/icons/clip.png"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-container>

@@ -1,0 +1,83 @@
+<div>
+    <div class="container-page">
+        <aside class="dashboard-menu">
+            <div class="dashboard-menu-item-1">
+                <div class="dashboard-menu-item-1">
+                    <h1 class="page-title">{{ 'sort' | translate }} :</h1>
+                    <select class="ml-2 dashboard-menu-item-select" [(ngModel)]="sortOption" (ngModelChange)="sort($event)">
+                        <option value="">Default</option>
+                        <option value="status">Status</option>
+                        <option value="client_name">Client</option>
+                        <option value="asked_created_date">Creation date</option>
+                        <option value="asked_updated_date">Last update</option>
+                        <option value="asked_ref">Ticket reference</option>
+                    </select>
+                </div>
+                <div class="dashboard-menu-item-1 ml-2">
+                    <div class="dashboard-menu-item-1">
+                        <label class="mr-2 page-title">Asc</label>
+                        <input type="radio" name="sortOption" [(ngModel)]="selectedOptionSort" (ngModelChange)="onSortOptionChange()" value="asc" />
+                    </div>
+                    <div class="dashboard-menu-item-1 ml-2">
+                        <label class="mr-2 page-title">Desc</label>
+                        <input type="radio" name="sortOption" [(ngModel)]="selectedOptionSort" (ngModelChange)="onSortOptionChange()" value="desc" />
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-menu-item-2">
+                <button (click)="toggleCreateTicket()" class="header-buttons-item">
+                    <img src="assets/icons/create-ticket.png" alt="Add" class="header-buttons-item-logo mr-2"/>
+                    {{ 'newTicket' | translate }}
+                </button>
+            </div>
+            <!--
+                <div class="dashboard-menu-item-3">
+                    <div class="dashboard-menu-item-1 relative">
+                        <input
+                            class="dashboard-menu-item-search"
+                            placeholder="Research"
+                            [(ngModel)]="searchDescription"
+                            (keyup.enter)="search()"
+                        />
+                        <img
+                            alt="loupe"
+                            src="assets/icons/loupe.png"
+                            class="-ml-8 header-buttons-item-logo cursor-pointer"
+                            (click)="search()"
+                        />
+                    </div>
+                </div>
+            -->
+        </aside>
+        <main class="dashboard-main overflow-y-scroll custom-scrollbar">
+            <div *ngIf="isLoading; else ticketList" class="flex items-center justify-center h-full bg-white">
+                <svg class="animate-spin h-5 w-5 mr-3 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.878 3.2 8.062l2.83-2.83zM12 20c-3.042 0-5.878-1.135-8.062-3.2l-2.83 2.83A7.962 7.962 0 0012 24h.001c4.418 0 8-3.582 8-8V12h-4v8z"></path>
+                </svg>
+                <p class="text-gray-600">Loading tickets...</p>
+            </div>
+            <ng-template #ticketList>
+                <app-ticket
+                    *ngFor="let ticket of tickets; let i = index"
+                    [data]="ticket"
+                ></app-ticket>
+            </ng-template>
+        </main>
+        <!-- <div class="pagination">
+            <button (click)="changePage(-1)" class="pagination-button">Previous</button>
+            <span class="pagination-title mx-2">Page <strong class="pagination-page">{{ currentPage }}</strong> of <strong class="pagination-page">{{ totalPages }}</strong></span>
+            <button (click)="changePage(1)" class="pagination-button">Next</button>
+        </div> -->
+    </div>
+    <div class="dashboard-links">
+        <div routerLink="/statistique" class="dashboard-links-item">
+            <h1 class="nav-title">{{ 'statisticsTickets' | translate }}</h1>
+        </div>
+        <div routerLink="/document" class="dashboard-links-item">
+            <h1 class="nav-title">Document research</h1>
+        </div>
+    </div>
+</div>
+
+<app-model-create [isCreateTicketVisible]="(isCreateTicketVisible$ | async) ?? false"></app-model-create>

@@ -1,0 +1,278 @@
+<div class="container-page">
+    <aside class="dashboard-menu">
+        <div class="filter-sort">
+            <h2 class="page-title cursor-pointer" (click)="sort('asked_ref')">
+                Ticket reference
+                <div class="absolute" *ngIf="selectedOption === 'asked_ref'">
+                    <img src="assets/icons/iconTop.png" alt="top"/>
+                </div>
+            </h2>
+            <h2 class="page-title cursor-pointer" (click)="sort('asked_created_date')">
+                Creation date
+                <div class="absolute" *ngIf="selectedOption === 'asked_created_date'">
+                    <img src="assets/icons/iconTop.png" alt="top"/>
+                </div>
+            </h2>
+            <h2 class="page-title cursor-pointer" (click)="sort('asked_updated_date')">
+                Last update
+                <div class="absolute" *ngIf="selectedOption === 'asked_updated_date'">
+                    <img src="assets/icons/iconTop.png" alt="top"/>
+                </div>
+            </h2>
+            <h2 class="page-title cursor-pointer" (click)="sort('ship')">
+                Ship
+                <div class="absolute" *ngIf="selectedOption === 'ship'">
+                    <img src="assets/icons/iconTop.png" alt="top"/>
+                </div>
+            </h2>
+        </div>
+        <div class="dashboard-menu">
+            <div class="dashboard-menu-item-1 ml-2">
+                <div class="dashboard-menu-item-1">
+                    <label class="mr-2 page-title">Asc</label>
+                    <input type="radio" name="sortOption" [(ngModel)]="selectedOptionSort" (ngModelChange)="onSortOptionChange()" value="asc" />
+                </div>
+                <div class="dashboard-menu-item-1 ml-2">
+                    <label class="mr-2 page-title">Desc</label>
+                    <input type="radio" name="sortOption" [(ngModel)]="selectedOptionSort" (ngModelChange)="onSortOptionChange()" value="desc" />
+                </div>
+            </div>
+            <div class="relative dashboard-menu-item-2">
+                <button
+                    class="text-black col-span-1 page-title flex justify-center" (click)="toggleFilter()"
+                    [class.active]="showFilter"
+                    [class.filter]="isfilter"
+                >
+                    <img alt="filter" src="assets/icons/filter.png" class="header-buttons-item-logo"/>
+                    {{ 'filter' | translate }}
+                </button>
+                <div *ngIf="showFilter" class="rounded-[10px] text-[10px] absolute top-[16rem] -left-[65px] transform -translate-y-1/2 bg-white border border-dotted border-[#E30039] py-1 px-2" style="z-index: 2;">
+                    <div class="flex">
+                        <h1 class="font-semibold mr-2">Type</h1>
+                        <button
+                            class="p-1 text-black border border-solid border-black mr-2 rounded-[10px]"
+                            [ngClass]="{ 'selected': typeFilter === 'PRFS' }"
+                            (click)="applyTypeFilter('PRFS')"
+                        >
+                            PRFS
+                        </button>
+                        <button
+                            class="p-1 text-black border border-solid border-black mr-2 rounded-[10px]"
+                            [ngClass]="{ 'selected': typeFilter === 'PRFM' }"
+                            (click)="applyTypeFilter('PRFM')"
+                        >
+                            PRFM
+                        </button>
+                        <button
+                            class="p-1 text-black border border-solid border-black mr-2 rounded-[10px]"
+                            [ngClass]="{ 'selected': typeFilter === 'PRMA' }"
+                            (click)="applyTypeFilter('PRMA')"
+                        >
+                            PRMA
+                        </button>
+                    </div>
+                    <div class="flex mt-2">
+                        <h1 class="alignements2">Status</h1>
+                        <select class="alignementsSelect"  [(ngModel)]="statusFilter" (ngModelChange)="applyStatusFilter($event)">
+                            <option value=0 selected>All</option>
+                            <ng-container *ngFor="let stt of status">
+                                <option *ngIf="stt.status_id !== 6" [value]="stt.status_id" class="flex items-center justify-start">
+                                  {{ stt.status_label }}
+                                </option>
+                            </ng-container>
+                        </select>
+                    </div>
+                    <div class="flex mt-2">
+                        <h1 class="alignements2">Client</h1>
+                        <select class="alignementsSelect"  [(ngModel)]="client" (ngModelChange)="applyClientFilter($event)">
+                            <!--
+                                <option value="" selected>None</option>
+                            -->
+                            <option *ngFor="let customer of customers" [value]="customer.customer_uuid">{{ customer.customer_name }}</option>
+                        </select>
+                    </div>
+                    <div class="flex mt-2">
+                        <h1 class="alignements2">Ships</h1>
+                        <select class="alignementsSelect"  [(ngModel)]="ship" (ngModelChange)="applyShipFilter($event)">
+                            <!--
+                                <option value="" selected>None</option>
+                            -->
+                            <option *ngFor="let ship of ships" [value]="ship.ship_uuid">{{ ship.ship_name }}</option>
+                        </select>
+                    </div>
+                    <div class="flex mt-2">
+                        <h1 class="alignements2">Type</h1>
+                        <select class="alignementsSelect"  [(ngModel)]="skill" (ngModelChange)="applySkillFilter($event)">
+                            <!--
+                                <option value="" selected>None</option>
+                            -->
+                            <option *ngFor="let skill of skills" [value]="skill.skill_id">{{ skill.skill_label }}</option>
+                        </select>
+                    </div>
+                    <div class="flex mt-2">
+                        <h1 class="alignements2">Side</h1>
+                        <select class="alignementsSelect"  [(ngModel)]="side" (ngModelChange)="applySideFilter($event)">
+                            <!--
+                                <option value="" selected>None</option>
+                            -->
+                            <option *ngFor="let side of sides" [value]="side.side_id">{{ side.side_label }}</option>
+                        </select>
+                    </div>
+                    <div class="flex mt-2">
+                        <h1 class="alignements2">Type Effect</h1>
+                        <select class="alignementsSelect"  [(ngModel)]="effectType" (ngModelChange)="applyEffectTypeFilter($event)">
+                            <!--
+                                <option value="" selected>None</option>
+                            -->
+                            <option *ngFor="let effectType of effectTypes" [value]="effectType.effect_type_id">{{ effectType.effect_type_label }}</option>
+                        </select>
+                    </div>
+                    <div class="flex mt-2">
+                        <h1 class="alignements2">Comp Level</h1>
+                        <select class="alignementsSelect"  [(ngModel)]="level" (ngModelChange)="applyLevelFilter($event)">
+                            <!--
+                                <option value="" selected>None</option>
+                            -->
+                            <option *ngFor="let level of levels" [value]="level.level_id">{{ level.level_label }}</option>
+                        </select>
+                    </div>
+                    <div class="flex mt-2">
+                        <h1 class="alignements2">Effect</h1>
+                        <select class="alignementsSelect"  [(ngModel)]="effect" (ngModelChange)="applyEffectFilter($event)">
+                            <!--
+                                <option value="" selected>None</option>
+                            -->
+                            <option *ngFor="let effect of effects" [value]="effect.effect_id">{{ effect.effect_label }}</option>
+                        </select>
+                    </div>
+                    <div class="flex mt-2">
+                        <h1 class="alignements2">Tag</h1>
+                        <select class="alignementsSelect"  [(ngModel)]="tag" (ngModelChange)="applyTagFilter($event)">
+                            <!--
+                                <option value="" selected>None</option>
+                            -->
+                            <option *ngFor="let tag of tags" [value]="tag.tag_id">{{ tag.tag_label }}</option>
+                        </select>
+                    </div>
+                    <div class="flex mt-2">
+                        <h1 class="alignements2">Technicien support</h1>
+                        <select class="alignementsSelect"  [(ngModel)]="technicien_support" (ngModelChange)="applyTechnicienSupportFilter($event)">
+                            <!--
+                                <option value="" selected>None</option>
+                            -->
+                            <option *ngFor="let techniciensupport of techniciensSupport" [value]="techniciensupport.user_uuid">{{ techniciensupport.user_name }} {{ techniciensupport.user_first_name }}</option>
+                        </select>
+                    </div>
+                    <div class="flex mt-2">
+                        <h1 class="alignements2">Date start</h1>
+                        <input
+                            class="alignementsSelect ml"
+                            type="date"
+                            [(ngModel)]="startDate"
+                            (ngModelChange)="applyDateFilter()"
+                        />
+                    </div>
+                    <div class="flex mt-2" *ngIf="startDate">
+                        <h1 class="alignements2">Date end</h1>
+                        <input
+                            class="alignementsSelect"
+                            type="date"
+                            [(ngModel)]="endDate"
+                            (ngModelChange)="applyDateFilter()"
+                            [min]="startDate"
+                        />
+                    </div>
+                    <div class="flex justify-center mt-2">
+                        <button (click)="resetFilter()" class="bg-custom px-4 py-2 border border-solid border-black rounded-[10px] text-black ">Reset</button>
+                    </div>
+                </div>
+            </div>
+            <div class="relative dashboard-menu-item-2">
+                <button class="col-span-1 page-title flex justify-center" (click)="toggleExport()" [class.active]="showExport">
+                    <img alt="export" src="assets/icons/export.png" class="header-buttons-item-logo"/>
+                    {{ 'export' | translate}}
+                </button>
+                <div *ngIf="showExport" class="z-40 text-[10px] rounded-[10px] absolute  top-[80px] -left-[65px] transform -translate-y-1/2 bg-white border border-dotted border-[#E30039] py-1 px-2">
+                    <div class="flex">
+                        <button
+                            [ngClass]="{ 'selected': exportType === 'csv' }"
+                            (click)="exportTypeSet('csv')"
+                            class="py-1 px-2 text-black border border-solid border-black mr-2 rounded-[10px]">csv</button>
+                        <button
+                            [ngClass]="{ 'selected': exportType === 'json' }"
+                            (click)="exportTypeSet('json')"
+                            class="py-1 px-2 text-black border border-solid border-black mr-2 rounded-[10px]">json</button>
+                        <button
+                            [ngClass]="{ 'selected': exportType === 'pdf' }"
+                            (click)="exportTypeSet('pdf')"
+                            class="py-1 px-2 text-black border border-solid border-black mr-2 rounded-[10px]">pdf</button>
+                        <button
+                            [ngClass]="{ 'selected': exportType === 'xls' }"
+                            (click)="exportTypeSet('xls')"
+                            class="py-1 px-2 text-black border border-solid border-black mr-2 rounded-[10px]">xls</button>
+                    </div>
+                    <div class="flex justify-center items-center mt-2">
+                        <button
+                            (click)="exportData()"
+                            class="bg-custom font-semibold py-1 px-4 text-black rounded-[10px]">Export</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-menu-item-3">
+            <div class="dashboard-menu-item-1 relative">
+                <input
+                    class="dashboard-menu-item-search"
+                    placeholder="Research"
+                    [(ngModel)]="searchDescription"
+                    (keyup.enter)="search()"
+                />
+                <img
+                    alt="loupe"
+                    src="assets/icons/loupe.png"
+                    class="-ml-8 header-buttons-item-logo"
+                    (click)="search()"
+                />
+            </div>
+            <select
+                [(ngModel)]="searchDescriptionOption"
+                class="ml-2 p-[6px] w-[5rem] font-inter font-normal text-sm rounded-[.2rem]"
+                (change)="fetchTickets()"
+            >
+                <option value="1">Ref</option>
+                <option value="2">Description</option>
+                <option value="3">Analysis</option>
+                <option value="4">Incident report</option>
+                <option value="5">Root cause</option>
+                <option value="6">Action taken</option>
+                <option value="7">Tag</option>
+            </select>
+        </div>
+    </aside>
+
+    <main class="dashboard-main overflow-y-scroll custom-scrollbar">
+        <div *ngIf="isLoading; else ticketList" class="flex items-center justify-center h-full bg-white">
+            <svg class="animate-spin h-5 w-5 mr-3 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.878 3.2 8.062l2.83-2.83zM12 20c-3.042 0-5.878-1.135-8.062-3.2l-2.83 2.83A7.962 7.962 0 0012 24h.001c4.418 0 8-3.582 8-8V12h-4v8z"></path>
+            </svg>
+            <p class="text-gray-600">Loading tickets...</p>
+        </div>
+
+        <ng-template #ticketList>
+            <app-ticket *ngFor="let ticket of tickets" [data]="ticket"></app-ticket>
+        </ng-template>
+    </main>
+    <div class="pagination">
+        <button (click)="changePage(-1)" class="pagination-button">Previous</button>
+
+        <ng-container *ngFor="let pageNumber of getPageNumbers(currentPage, totalPages)">
+            <button *ngIf="pageNumber !== '...'" [class.active]="pageNumber === currentPage" (click)="goToPage(pageNumber)" class="pagination-button">{{ pageNumber }}</button>
+            <span *ngIf="pageNumber === '...'">{{ pageNumber }}</span>
+        </ng-container>
+
+        <input [(ngModel)]="currentPage" (keyup.enter)="goToPage(currentPage)" class="pagination-input" type="number" min="1" [max]="totalPages" />
+
+        <button (click)="changePage(1)" class="pagination-button">Next</button>
+    </div>
+</div>

@@ -1,0 +1,11 @@
+input, textarea, select {
+    outline: none; 
+}
+
+.message-content {
+    width: 85%; 
+    word-wrap: break-word;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    margin: 0.25rem 0;
+}

@@ -1,0 +1,24 @@
+button.active {
+  border-radius: 10px;
+  border: 1px dashed rgba(0, 0, 0, 0.50);
+  background: #C8E1FF;
+  padding: 2px;
+  width: 80px;
+}
+
+.circle {
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.selected {
+  color: white;
+  background-color: #E30039;
+}
+
+select, input {
+  outline: none;
+}

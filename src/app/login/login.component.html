@@ -1,0 +1,61 @@
+<div class="page-container flex flex-col">
+    <div class="content flex justify-center items-center flex-grow">
+        <div class="bg-[#EEE] w-[90%] sm:w-[400px] mx-auto rounded-[10px] my-4 py-8 px-2">
+            <h1 class="text-center text-xl md:text-2xl font-bold mt-1 mb-3"> User <br> Authentication </h1>
+
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex-1 border-t-2 border-[#E30039]"></div>
+                <h1 class="text-center text-base md:text-lg font-semibold px-2"> Login with email </h1>
+                <div class="flex-1 border-t-2 border-[#E30039]"></div>
+            </div>
+
+            <form [formGroup]="loginForm" (ngSubmit)="loginUser()" class="px-4 md:px-6">
+                <div class="mb-2">
+                    <h4>Email</h4>
+                    <input type="email" formControlName="email" placeholder="Email" class="w-full border rounded-[10px] p-3"
+                        [ngClass]="{ 'border-[#FF0000] bg-[#ff00004d]': email && email.invalid && email.touched, 'border-gray-300': !email || !email.invalid || !email.touched }" />
+                    <br>
+                    <span class="text-[#FF0000] text-sm" *ngIf="email && email.invalid && email.touched">Format de l’email invalide.</span>
+                </div>
+                <div class="mb-2">
+                    <h4>Mot de passe</h4>
+                    <div class="flex items-center relative">
+                        <input 
+                            type="{{ showPassword ? 'text' : 'password' }}" 
+                            formControlName="password" 
+                            placeholder="Password" 
+                            class="w-full border border-gray-300 rounded-[10px] p-3"
+                            [ngClass]="{ 'border-[#FF0000] bg-[#ff00004d]': password && password.invalid && password.touched, 'border-gray-300': !password || !password.invalid || !password.touched }" 
+                        />
+                        <img 
+                            src="assets/icons/{{ showPassword ? 'hide.png' : 'visible.png' }}" 
+                            alt="Toggle Password Visibility" 
+                            class="w-4 h-4 absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                            (click)="showPassword = !showPassword" 
+                        />
+                    </div>                                            
+                    <br>
+                    <span class="text-[#FF0000] text-sm" *ngIf="password && password.invalid && password.touched">Mot de passe invalide.</span>
+                </div>
+                <div class="mb-2 flex justify-end">
+                    <h6 class="text-custom cursor-pointer" routerLink="/login/forget/password">Forgot your password?</h6>
+                </div>
+                <div *ngIf="errorMessage" class="text-center text-[#FF0000] capitalize my-2 text-sm">
+                    {{ errorMessage }}
+                </div>
+                <div class="flex justify-center">
+                    <button [disabled]="loginForm.invalid || loading" class="w-full md:w-auto px-8 bg-custom text-black font-semibold py-4 rounded">
+                        <span *ngIf="!loading">Login</span>
+                        <span *ngIf="loading" class="flex items-center">
+                            <svg class="animate-spin h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.963 7.963 0 014 12H0c0 4.418 3.582 8 8 8v-4.01zm13.196-1.383A10.001 10.001 0 0021.22 12h-4.02a6.001 6.001 0 11-6.001-6h-2a8.001 8.001 0 108.177 5.908l1.018 1.018z"></path>
+                            </svg>
+                            Loading...
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

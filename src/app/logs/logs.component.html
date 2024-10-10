@@ -1,0 +1,81 @@
+<div class="container-page">
+    <div class="text-sm flex items-center justify-start mb-2">
+        <h2 class="page-title">Advanced research</h2>
+
+        <img (click)="togglePlusClick()" *ngIf="plusClick" src="assets/icons/plus.png" class="ml-2 cursor-pointer header-buttons-item-logo"  />
+        <div (click)="togglePlusClick()" *ngIf="!plusClick" class="header-buttons-item-logo cursor-pointer ml-2 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="1" viewBox="0 0 15 1" fill="none">
+                <line y1="-0.5" x2="14.1421" y2="-0.5" transform="matrix(1 0 0 -1 0 0)" stroke="black"/>
+            </svg>
+        </div>
+    </div>
+    <div *ngIf="!plusClick" class="my-2 text-sm">
+        <div class="flex items-center justify-between">
+            <div class="flex flex-col items-center px-1">
+                <h1 class="page-title-element">Type Logs</h1>
+                <select [(ngModel)]="selectedLogType" class="creation-item-select-prma">
+                    <!--
+                        <option value=0>None</option>
+                    -->
+                    <option *ngFor="let logType of askedLogsType" [value]="logType.asked_log_type_id">{{logType.asked_log_type_label}}</option>
+                </select>
+            </div>
+            <div class="flex items-center justify-center px-1">
+                <h1 class="page-title-element mr-2">Created</h1>
+                <input
+                    class="creation-item-input-prma mr-2"
+                    type="date"
+                    [(ngModel)]="startDate"
+                />
+                <input
+                    class="creation-item-input-prma"
+                    type="date"
+                    [(ngModel)]="endDate"
+                />
+            </div>
+            <div class="flex justify-center items-center px-1">
+                <button (click)="search()" class="header-buttons-item">Search</button>
+            </div>
+    
+        </div>
+    </div>
+    <div>
+        <h2 class="documents-title-table page-title">Research result</h2>
+        <div>
+            <div *ngIf="isLoading; else documentsList" class="flex items-center justify-center h-full bg-white">
+                <svg class="animate-spin h-5 w-5 mr-3 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.878 3.2 8.062l2.83-2.83zM12 20c-3.042 0-5.878-1.135-8.062-3.2l-2.83 2.83A7.962 7.962 0 0012 24h.001c4.418 0 8-3.582 8-8V12h-4v8z"></path>
+                </svg>
+                <p class="text-gray-600">Loading tickets...</p>
+            </div>
+            <ng-template #documentsList>
+                <table class="documents-table-t custom-scrollbar">
+                    <thead class="documents-thead">   
+                        <tr>
+                            <th class="documents-thead-element">Text</th>
+                            <th class="documents-thead-element">Log Type</th>
+                            <th class="documents-thead-element">Asked</th>
+                            <th class="documents-thead-element">User</th>
+                            <th class="documents-thead-element">Created on</th>
+                        </tr>             
+                    </thead>
+                    <tbody class="documents-thead">
+                        <tr *ngFor="let log of askedLogs" class="documents-tbody-tr">
+                            <td class="documents-tbody-element">{{ log.asked_log_text }}</td>
+                            <td class="documents-tbody-element">{{ log.AskedLogType.asked_log_type_label }}</td>
+                            <td class="documents-tbody-element">{{ log.Asked.asked_ref }}</td>
+                            <td class="documents-tbody-element">{{ log.User.user_name }}-{{ log.User.user_first_name }}</td>
+                            <td class="documents-tbody-element">{{ log.asked_log_created_date | date:'yyyy MMM dd HH:mm:ss' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </ng-template>
+        </div>
+        <div class="pagination">
+            <button (click)="changePage(-1)" class="pagination-button">Previous</button>
+            <span class="pagination-title mx-2">Page <strong class="pagination-page">{{ currentPage }}</strong> of <strong class="pagination-page">{{ totalPages }}</strong></span>
+            <button (click)="changePage(1)" class="pagination-button">Next</button>
+        </div>
+    </div>
+</div>

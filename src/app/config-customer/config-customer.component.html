@@ -1,0 +1,265 @@
+<div class="grid grid-cols-4 font-inter text-sm font-semibold">
+    <div class="container-config h-[25rem]">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class=" bg-[#FFF] rounded-[10px]">
+            <div class="config-title">
+                <h1>Add customer</h1>
+            </div>
+            <div class="p-4 flex flex-col justify-between">
+                <div>
+                    <div class="flex flex-col justify-center text-base items-center mb-2">
+                        <label class="config-title-ticket">SIRET</label>
+                        <input formControlName="customer_siret" placeholder="Siret" type="text" class="p-1 font-normal border border-solid border-[#E30039]" />
+                    </div>
+                    <div class="flex flex-col justify-center text-base items-center mb-2">
+                        <label class="config-title-ticket">Name</label>
+                        <input formControlName="customer_name" placeholder="Name" type="text" class="p-1 font-normal border border-solid border-[#E30039]" />
+                    </div>
+                    <div class="flex flex-col text-base justify-center items-center mb-2">
+                        <label class="config-title-ticket">Description</label>
+                        <input formControlName="customer_description" placeholder="Description" type="text" class="p-1 font-normal border border-solid border-[#E30039]" />
+                    </div>
+                </div>
+                <div class="flex justify-center text-base items-center mb-2">
+                    <button type="submit" class="flex mt-16 items-center justify-center bg-custom text-black rounded-[10px] border border-solid border-black p-2">
+                        <img src="assets/icons/save.png" class="w-5 h-5 mr-2"/>
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-span-3 h-[25rem]">
+        <div class=" col-span-3 container-config">
+            <div class="config-title">
+                <h1>Field list</h1>
+            </div>
+            <div class="p-4 grid grid-cols-3 rounded-b-[10px]">
+                <div class="px-6  overflow-hidden">
+                    <div class="text-base b-4">
+                        <label class="config-title-ticket">Customers</label>
+                    </div>
+                    <div class="p-2 h-[15rem] mt-3 border border-solid border-black  overflow-y-scroll custom-scrollbar">
+                        <h2 class="my-4 cursor-pointer" (click)="selectCustomer('')" [ngClass]="{ 'selected-customer':  idCustomer === '' }">All</h2>
+                        <h2
+                            *ngFor="let customer of customers"
+                            class="my-4 cursor-pointer config-ticket-list-item"
+                            (click)="selectCustomer(customer.customer_uuid)"
+                            [ngClass]="{ 'selected-customer': customer.customer_uuid === idCustomer }"
+                        >
+                            {{ customer.customer_name }}
+                        </h2>
+                    </div>
+                </div>
+                <div class="px-6 text-base overflow-hidden">
+                    <div class="text-base b-4">
+                        <label class="config-title-ticket">Fleets</label>
+                    </div>
+                    <div class="">
+                        <div class="p-2 h-[15rem] border border-solid border-black overflow-y-scroll custom-scrollbar">
+                            <h2 class="my-4 cursor-pointer" (click)="selectFleet(0, '', '')" [ngClass]="{ 'selected-customer':  idFleet === 0 }">All</h2>
+                            <h2
+                                *ngFor="let fleet of fleets"
+                                class="my-4 cursor-pointer config-ticket-list-item"
+                                (click)="selectFleet(fleet.fleet_id,fleet.fleet_name, fleet.fleet_description)"
+                                [ngClass]="{ 'selected-customer': fleet.fleet_id === idFleet }"
+                            >
+                                {{ fleet.fleet_name }}
+                            </h2>
+                        </div>
+                        <div class="flex justify-start items-start">
+                            <button
+                                (click)="toggleCreationFleet()"
+                                class="flex items-center mt-5 justify-center bg-custom mr-2 text-black rounded-[10px] border border-solid border-black py-2 px-8"
+                            >
+                                <img src="assets/icons/create-ticket.png" class="w-5  mr-2"/>
+                                New Fleet
+                            </button>
+                            <button
+                                (click)="toggleUpdateFleet()"
+                                class="flex items-center mt-4 justify-center bg-custom mr-2 text-black rounded-[10px] border border-solid border-black p-2"
+                                *ngIf="idFleet !== 0"
+                            >
+                                <img src="assets/icons/update.png" class="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-6 overflow-hidden">
+                    <div class="text-base b-4">
+                        <label class="config-title-ticket">Ships</label>
+                    </div>
+                    <div class="">
+                        <div class="p-2 h-[15rem] border border-solid border-black overflow-y-scroll custom-scrollbar">
+                            <h2
+                                *ngFor="let ship of ships"
+                                class="my-4 cursor-pointer config-ticket-list-item"
+                                (click)="selectShip(ship.ship_uuid, ship.ship_name, ship.ship_description)"
+                                [ngClass]="{ 'selected-customer': ship.ship_uuid === uuidShip }"
+                            >
+                                {{ ship.ship_name }}
+                            </h2>
+                        </div>
+                        <div class="flex justify-start items-start">
+                            <button
+                                (click)="toggleCreationShip()"
+                                class="flex items-center mt-5 justify-center bg-custom mr-2 text-black rounded-[10px] border border-solid border-black py-2 px-8"
+                            >
+                                <img src="assets/icons/create-ticket.png" class="w-5  mr-2" />
+                                New Ship
+                            </button>
+                            <button
+                                (click)="toggleUpdateShip()"
+                                class="flex items-center mt-4 justify-center bg-custom mr-2 text-black rounded-[10px] border border-solid border-black p-2"
+                                *ngIf="uuidShip !== ''"
+                            >
+                                <img src="assets/icons/update.png" class="w-5 h-5"/>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isCreationShipVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isCreationShipVisible" class="absolute w-[350px] top-1/3 left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-black bg-[#D9D9D9] z-50 shadow-lg ">
+    <div class="flex justify-between bg-custom text-white py-3 px-4 rounded-t-[20px]">
+        <div></div>
+        <div><h1 class="mb-1">Add Ship</h1></div>
+        <div>
+            <img (click)="toggleCreationShip()" src="assets/icons/close.png" class="w-6 h-6 cursor-pointer"/>
+        </div>
+    </div>
+    <div class="flex flex-col justify-center items-center">
+        <label class="my-3 font-bold">Name</label>
+        <input type="text" class="p-2 text-black bg-white border border-solid border-[#E30039]" [(ngModel)]="nameShip" name="nameShip" />
+    </div>
+
+    <div class="flex justify-around px-6 mt-8 mb-2">
+        <button
+            class="flex items-center justify-center border border-solid border-black rounded-[10px] mr-6 bg-custom text-black font-bold shadow-lg py-1 px-3"
+            (click)="createNewShip()"
+        >
+            <img src="assets/icons/save.png" class="mr-2"/>
+            Confirm
+        </button>
+        <button
+            class="flex items-center justify-center border border-solid border-black rounded-[10px] bg-[#FFFFFF] text-black font-bold shadow-lg py-1 px-3"
+            (click)="toggleCreationShip()"
+        >
+            <img src="assets/icons/cancel.png" class="mr-2 w-6 h-6" />
+            Cancel
+        </button>
+    </div>
+</div>
+
+<div *ngIf="isCreationFleetVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isCreationFleetVisible" class="absolute w-[350px] top-1/3 left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-black bg-[#D9D9D9] z-50 shadow-lg ">
+    <div class="flex justify-between bg-custom text-white py-3 px-4 rounded-t-[20px]">
+        <div></div>
+        <div><h1 class="mb-1">Add Fleet</h1></div>
+        <div>
+            <img (click)="toggleCreationFleet()" src="assets/icons/close.png" class="w-6 h-6 cursor-pointer"/>
+        </div>
+    </div>
+    <div class="flex flex-col justify-center items-center">
+        <label class="my-3 font-bold">Name</label>
+        <input type="text" class="p-2 text-black bg-white border border-solid border-[#E30039]" [(ngModel)]="nameFleet" name="nameFleet" />
+    </div>
+    <div class="flex flex-col justify-center items-center">
+        <label class="my-3 font-bold">Description</label>
+        <input type="text" class="p-2 text-black bg-white border border-solid border-[#E30039]" [(ngModel)]="descFleet" name="descFleet" />
+    </div>
+
+    <div class="flex justify-around px-6 mt-8 mb-2">
+        <button
+            class="flex items-center justify-center border border-solid border-black rounded-[10px] mr-6 bg-custom text-black font-bold shadow-lg py-1 px-3"
+            (click)="createNewFleet()"
+        >
+            <img src="assets/icons/save.png" class="mr-2" />
+            Confirm
+        </button>
+        <button
+            class="flex items-center justify-center border border-solid border-black rounded-[10px] bg-[#FFFFFF] text-black font-bold shadow-lg py-1 px-3"
+            (click)="toggleCreationFleet()"
+        >
+            <img src="assets/icons/cancel.png" class="mr-2 w-6 h-6" />
+            Cancel
+        </button>
+    </div>
+</div>
+
+<div *ngIf="isUpdateFleetVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isUpdateFleetVisible" class="absolute w-[350px] top-1/3 left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-black bg-[#D9D9D9] z-50 shadow-lg ">
+    <div class="flex justify-between bg-custom text-white py-3 px-4 rounded-t-[20px]">
+        <div></div>
+        <div><h1 class="mb-1">Update Fleet</h1></div>
+        <div>
+            <img (click)="toggleUpdateFleet()" src="assets/icons/close.png" class="w-6 h-6 cursor-pointer"/>
+        </div>
+    </div>
+    <div class="flex flex-col justify-center items-center">
+        <label class="my-3 font-bold">Name</label>
+        <input type="text" class="p-2 text-black bg-white border border-solid border-[#E30039]" [(ngModel)]="nameFleet" name="nameFleet" />
+    </div>
+    <div class="flex flex-col justify-center items-center">
+        <label class="my-3 font-bold">Description</label>
+        <input type="text" class="p-2 text-black bg-white border border-solid border-[#E30039]" [(ngModel)]="descFleet" name="descFleet" />
+    </div>
+
+    <div class="flex justify-around px-6 mt-8 mb-2">
+        <button
+            class="flex items-center justify-center border border-solid border-black rounded-[10px] mr-6 bg-custom text-black font-bold shadow-lg py-1 px-3"
+            (click)="updateFleet()"
+        >
+            <img src="assets/icons/save.png" class="mr-2" />
+            Confirm
+        </button>
+        <button
+            class="flex items-center justify-center border border-solid border-black rounded-[10px] bg-[#FFFFFF] text-black font-bold shadow-lg py-1 px-3"
+            (click)="toggleUpdateFleet()"
+        >
+            <img src="assets/icons/cancel.png" class="mr-2 w-6 h-6" />
+            Cancel
+        </button>
+    </div>
+</div>
+
+<div *ngIf="isUpdateShipVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isUpdateShipVisible" class="absolute w-[350px] top-1/3 left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-black bg-[#D9D9D9] z-50 shadow-lg ">
+    <div class="flex justify-between bg-custom text-white py-3 px-4 rounded-t-[20px]">
+        <div></div>
+        <div><h1 class="mb-1">Update Ship</h1></div>
+        <div>
+            <img (click)="toggleUpdateShip()" src="assets/icons/close.png" class="w-6 h-6 cursor-pointer"/>
+        </div>
+    </div>
+    <div class="flex flex-col justify-center items-center">
+        <label class="my-3 font-bold">Name</label>
+        <input type="text" class="p-2 text-black bg-white border border-solid border-[#E30039]" [(ngModel)]="nameShip" name="nameShip" />
+    </div>
+    <div class="flex flex-col justify-center items-center">
+        <label class="my-3 font-bold">Description</label>
+        <input type="text" class="p-2 text-black bg-white border border-solid border-[#E30039]" [(ngModel)]="descShip" name="descShip" />
+    </div>
+
+    <div class="flex justify-around px-6 mt-8 mb-2">
+        <button
+            class="flex items-center justify-center border border-solid border-black rounded-[10px] mr-6 bg-custom text-black font-bold shadow-lg py-1 px-3"
+            (click)="updateShip()"
+        >
+            <img src="assets/icons/save.png" class="mr-2" />
+            Confirm
+        </button>
+        <button
+            class="flex items-center justify-center border border-solid border-black rounded-[10px] bg-[#FFFFFF] text-black font-bold shadow-lg py-1 px-3"
+            (click)="toggleUpdateShip()"
+        >
+            <img src="assets/icons/cancel.png" class="mr-2 w-6 h-6" />
+            Cancel
+        </button>
+    </div>
+</div>
+
+<app-popup *ngIf="isVisible" [error]="isError" [popupText]="text"></app-popup>

@@ -1,0 +1,16 @@
+<div class="page-container flex flex-col">
+    <div class="content flex justify-center items-center flex-grow">
+        <div class="bg-[#EEE] w-[90%] sm:w-[400px] mx-auto rounded-[10px] my-8 p-8">
+            <h1 class="text-center text-2xl font-bold">IT helpdesk</h1>
+            <div class="my-10 px-6 text-lg">
+                <p class="font-semibold mb-6">Here are the infos to contact helpdesk support:</p>
+                <p class="font-semibold underline">{{ emailAddress }}</p>
+                <p>Phone Number: +33666991339.</p>
+            </div>
+            <div class="flex justify-center">
+                <button class="bg-custom px-12 py-4 font-bold rounded-[10px] mb-10 text-black"
+                (click)="copyToClipboard()">{{ buttonText }}</button>
+            </div>
+        </div>
+    </div>
+</div>

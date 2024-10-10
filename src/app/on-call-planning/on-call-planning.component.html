@@ -1,0 +1,32 @@
+<div *ngIf="skill" class="flex flex-col items-center">
+    <div class="py-[1px]">
+        <div
+            class="relative text-black border border-solid border-black inline-flex items-center justify-center p-1 w-6 h-6 overflow-hidden rounded-full dark:bg-gray-600"
+            [ngStyle]="{ 'background-color': getBackgroundColor(skill.skill_id) }"
+            [class.bg-yellow]="skill.skill_id === 1"
+            [class.bg-blue]="skill.skill_id === 2"
+            [class.half-and-half]="skill.skill_id === 3"
+        >
+            <h2 class="font-normal text-[9px]">
+                {{ nameToshow }}
+            </h2>
+            <div class="half-overlay" *ngIf="skill.skill_id === 3"></div>
+        </div>
+    </div>
+    <div class="px-1">
+        <h1>{{ onCall.User.Role.role_label }}</h1>
+    </div>
+</div>
+
+<div *ngIf="!skill" class="flex flex-col items-center">
+    <div class="py-[1px]">
+        <div class="relative bg-white text-black border border-solid border-black inline-flex items-center justify-center p-1 w-6 h-6 overflow-hidden rounded-full">
+            <h2 class="font-normal text-[9px]">
+                {{ nameToshow }}
+            </h2>
+        </div>
+    </div>
+    <div class="px-1">
+        <h1>{{ onCall.User.Role.role_label }}</h1>
+    </div>
+</div>

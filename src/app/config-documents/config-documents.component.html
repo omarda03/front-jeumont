@@ -1,0 +1,137 @@
+<div class="grid lg:grid-cols-3 font-inter text-sm font-semibold">
+    <div class="col-span-2 container-config h-[25rem]">
+        <div class="config-title">
+            <h1>Add or edit document</h1>
+        </div>
+        <form [formGroup]="form" (ngSubmit)="submitFormUser()" class="p-4 rounded-b-[10px] flex flex-col justify-between h-[80%]">
+            <div class="grid grid-cols-3">
+                <div class="flex flex-col justify-center items-center mb-2">
+                    <label class="config-title-ticket">Reference</label>
+                    <input formControlName="doc_ref" type="text" placeholder="document reference" class="w-[15rem] p-1 font-normal border border-solid border-[#E30039]" />
+                </div>
+                <div class="flex flex-col justify-center items-center mb-2">
+                    <label class="config-title-ticket">Description</label>
+                    <input formControlName="doc_description" type="text" placeholder="document description" class="w-[15rem] p-1 font-normal border border-solid border-[#E30039]" />
+                </div>
+                <div class="flex flex-col justify-center items-center mb-2">
+                    <label class="config-title-ticket">Type</label>
+                    <input formControlName="doc_type" type="text" placeholder="document type" class="w-[15rem] p-1 font-normal border border-solid border-[#E30039]" />
+                </div>
+            </div>
+            <div class="grid grid-cols-3">
+                <div class="flex flex-col justify-center items-center mb-2">
+                    <label class="config-title-ticket">Size</label>
+                    <input formControlName="doc_size" type="text" placeholder="document size" class="w-[15rem] p-1 font-normal border border-solid border-[#E30039]" />
+                </div>
+                <div class="flex flex-col justify-center items-center mb-2">
+                    <label class="config-title-ticket">Last version</label>
+                    <input formControlName="doc_last_version" type="text" placeholder="document last version" class="w-[15rem] p-1 font-normal border border-solid border-[#E30039]" />
+                </div>
+                <div class="flex flex-col justify-center items-center mb-2">
+                    <label class="config-title-ticket">Localisation numerique</label>
+                    <input formControlName="doc_localisation_numerique" type="text" placeholder="document localisation numerique" class="w-[15rem] p-1 font-normal border border-solid border-[#E30039]" />
+                </div>
+            </div>
+            <div class="grid grid-cols-3">
+                <div class="flex flex-col justify-center items-center mb-2">
+                    <label class="config-title-ticket">Url</label>
+                    <input formControlName="doc_url" type="text" placeholder="document url" class="w-[15rem] p-1 font-normal border border-solid border-[#E30039]" />
+                </div>
+                <div class="flex flex-col justify-center items-center mb-2">
+                    <label class="config-title-ticket">Localisation espace reseau</label>
+                    <input formControlName="localisation_espace_reseau" type="text" placeholder="document localisation espace reseau" class="w-[15rem] p-1 font-normal border border-solid border-[#E30039]" />
+                </div>
+                <div class="flex flex-col justify-center items-center mb-2">
+                    <label class="config-title-ticket">Categorie</label>
+                    <select formControlName="cat_id" class="w-[15rem] p-1 font-normal border border-solid border-[#E30039]">
+                        <!--
+                            <option value="0">None</option>
+                        -->
+                        <option *ngFor="let categorie of categories" [value]="categorie.cat_id">{{categorie.cat_label}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-3">
+                <div class="flex flex-col justify-center items-center mb-2">
+                    <label class="config-title-ticket">User</label>
+                    <select formControlName="user_uuid" class="w-[15rem] p-1 font-normal border border-solid border-[#E30039]">
+                        <!--
+                            <option value="">None</option>
+                        -->
+                        <option *ngFor="let user of users" [value]="user.user_uuid">{{ user.user_name }} || {{ user.user_first_name }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-center items-center">
+                <button class="flex items-center justify-center bg-custom mr-2 text-black rounded-[10px] border border-solid border-black py-2 px-8">
+                    <img src="assets/icons/save.png" class="w-5 h-5 mr-2" />
+                    {{ selectedDocument ? 'Edit' : 'Add'}}
+                </button>
+                <button
+                    (click)="cancelCreationDocument()"
+                    class="flex items-center justify-center bg-[#D9D9D9] text-black rounded-[10px] border border-solid border-black py-2 px-8"
+                >
+                    <img src="assets/icons/cancel.png" class="w-5 h-5 mr-2" />
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="container-config h-[25rem]">
+        <div class="config-title">
+            <h1>Load existing document</h1>
+        </div>
+        <form [formGroup]="formCheck" class="p-4 rounded-b-[10px] flex flex-col items-center justify-between h-[80%]">
+            <div class="flex flex-col justify-center items-center">
+                <select 
+                    [(ngModel)]="selectedDocument" [ngModelOptions]="{standalone: true}" (change)="updateFormValues()" 
+                    class="p-1 font-normal border border-solid border-[#E30039] w-[10rem]"
+                >
+                    <!--
+                        <option [ngValue]="null">None</option>
+                    -->
+                    <option *ngFor="let document of documentsInterne" [ngValue]="document">{{ document.doc_ref }} ({{ document.doc_description }})</option>
+                </select>
+            </div>
+            <div *ngIf="selectedDocument" class="flex justify-center items-center">
+                <button
+                    (click)="toggleDeleteDocument()"
+                    class="flex items-center justify-center bg-[#D9D9D9] text-black rounded-[10px] border border-solid border-black py-2 px-8"
+                >
+                    <img src="assets/icons/delete.png" class="w-4 h-5 mr-2" />
+                    Delete
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div *ngIf="isDeleteDocumentVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isDeleteDocumentVisible" class="absolute w-[450px] top-1/3 left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-black bg-[#D9D9D9] z-50 shadow-lg ">
+    <div class="flex justify-between bg-custom text-white py-3 px-4 rounded-t-[20px]">
+        <div></div>
+        <div><h1 class="mb-1">Delete document</h1></div>
+        <div><img (click)="toggleDeleteDocument()" src="assets/icons/close.png" class="w-6 h-6 cursor-pointer"/></div>
+    </div>
+    <div class="flex justify-center items-center py-8">
+        <h2 class="text-lg font-semibold">Are you sure you want to delete this document ?</h2>
+    </div>
+    <div class="flex justify-around px-6 mb-2">
+        <button
+            class="flex items-center justify-center border border-solid border-black rounded-[10px] mr-6 bg-custom text-black font-bold shadow-lg py-1 px-6"
+            (click)="deleteDocument()"
+        >
+            <img src="assets/icons/save.png" class="mr-2" />
+            Confirm
+        </button>
+        <button
+            class="flex items-center justify-center border border-solid border-black rounded-[10px] bg-[#FFFFFF] text-black font-bold shadow-lg py-1 px-6"
+            (click)="toggleDeleteDocument()"
+        >
+            <img src="assets/icons/cancel.png" class="mr-2 w-6 h-6" />
+            Cancel
+        </button>
+    </div>
+</div>
+
+<app-popup *ngIf="isVisible" [error]="isError" [popupText]="text"></app-popup>

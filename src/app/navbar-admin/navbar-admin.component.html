@@ -1,0 +1,272 @@
+<nav class="nav-container">
+    <div class="nav-sec-1" (click)="toggleMenu()">
+        <div class="flex items-center cursor-pointer">
+            <img [src]="menuImgSrc" class="nav-menu-icon" />
+            <h2 class="ml-2 nav-menu-title">Menu</h2>
+        </div>
+    </div>
+  
+    <div class="nav-sec-2">
+        <h2 class="nav-title">{{ title | translate }}</h2>
+    </div>
+  
+    <div class="nav-sec-3">
+        <div *ngIf="isTechnnavRoute()" class="nav-planning font-semibold">
+            <div class="nav-planning-item-gray">
+                <div>
+                    <h2 class="nav-planning-item-title">Week {{lastWeek}}</h2> 
+                </div>  
+                <div class="flex items-center">
+                    <div *ngFor="let oncall of onCallsLastWeek">
+                        <ng-container *ngIf="oncall.primary_backup">
+                            <div class="relative ml-1" 
+                                (mouseleave)="isHovered = false && isLast = false && isPrimary = false && mail= ''" 
+                                (mouseenter)="isHovered = true && isLast = true && isPrimary = true && mail= oncall.user_email"
+                            >
+                                <div class="icon-user"
+                                    [ngClass]="{
+                                        'bg-[#E3D617]': oncall.skill_id === 1,
+                                        'bg-[#17AFE3]': oncall.skill_id === 2,
+                                        'bg-[#7DC37D]': oncall.skill_id === 3,
+                                        'bg-[#D3D3D3]': oncall.skill_id !== 1 && oncall.skill_id !== 2 && oncall.skill_id !== 3
+                                    }"
+                                >
+                                    <h1><span>{{ oncall.user_first_name.charAt(0) }}{{ oncall.user_name.charAt(0) }}{{ oncall.user_name.charAt(oncall.user_name.length - 1) }}</span></h1>
+                                </div>
+                                <div class="z-50 absolute top-0 right-20 w-max p-1 bg-white text-black text-[9px] rounded-md border border-solid border-black" 
+                                    *ngIf="isHovered && mail === oncall.user_email && isLast && isPrimary">
+                                    <div *ngIf="!isCustomerEnabled()">Mail: {{ oncall.user_email }}</div>
+                                    <div class="text-[8px]">
+                                        <div>Name: {{ oncall.user_first_name }} {{ oncall.user_name }}</div>
+                                        <div *ngIf="!isCustomerEnabled()">Phone: {{ oncall.user_phone }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>                   
+                    </div>
+                </div>
+                <div class="nav-planning-item-right">
+                    <div *ngFor="let oncall of onCallsLastWeek">
+                        <ng-container *ngIf="oncall.emergency_backup">
+                            <div class="relative mx-1" (mouseleave)="isHovered = false && isLast = false && isEmergency = false  && mail= ''" (mouseenter)="isHovered = true && isLast = true && isEmergency = true && mail= oncall.user_email">
+                                <div class="icon-user"
+                                    [ngClass]="{
+                                        'bg-[#E3D617]': oncall.skill_id === 1,
+                                        'bg-[#17AFE3]': oncall.skill_id === 2,
+                                        'bg-[#7DC37D]': oncall.skill_id === 3,
+                                        'bg-[#D3D3D3]': oncall.skill_id !== 1 && oncall.skill_id !== 2 && oncall.skill_id !== 3
+                                    }"
+                                >
+                                    <h1><span>{{ oncall.user_first_name.charAt(0) }}{{ oncall.user_name.charAt(0) }}{{ oncall.user_name.charAt(oncall.user_name.length - 1) }}</span></h1>
+                                </div>
+                                <div class="z-50 absolute top-0 right-6 w-max p-1 bg-white text-black text-[9px] rounded-md border border-solid border-black" 
+                                    *ngIf="isHovered && isEmergency && mail === oncall.user_email && isLast">
+                                    <div *ngIf="!isCustomerEnabled()">Mail: {{ oncall.user_email }} </div>
+                                    <div class="text-[8px]">
+                                        <div>Name: {{ oncall.user_first_name }} {{ oncall.user_name }}</div>
+                                        <div *ngIf="!isCustomerEnabled()">Phone: {{ oncall.user_phone }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>                                
+                    </div>  
+                </div>
+            </div>
+            <div class="nav-planning-item-blue my-[2px]">
+                <div>
+                    <h2 class="nav-planning-item-title underline">Week {{currentWeek}}</h2>
+                </div>    
+                <div class="flex items-center">
+                    <div *ngFor="let oncall of onCallsThisWeek">
+                        <ng-container *ngIf="oncall.primary_backup">
+                            <div class="relative ml-1" 
+                                (mouseleave)="isHovered = false && isCurrent = false && isPrimary = false && mail= ''" 
+                                (mouseenter)="isHovered = true && isCurrent = true && isPrimary = true  && mail= oncall.user_email"
+                            >
+                                <div class="icon-user"
+                                    [ngClass]="{
+                                        'bg-[#E3D617]': oncall.skill_id === 1,
+                                        'bg-[#17AFE3]': oncall.skill_id === 2,
+                                        'bg-[#7DC37D]': oncall.skill_id === 3,
+                                        'bg-[#D3D3D3]': oncall.skill_id !== 1 && oncall.skill_id !== 2 && oncall.skill_id !== 3
+                                    }"
+                                >
+                                    <h1><span>{{ oncall.user_first_name.charAt(0) }}{{ oncall.user_name.charAt(0) }}{{ oncall.user_name.charAt(oncall.user_name.length - 1) }}</span></h1>
+                                </div>
+                                <div class="z-50 absolute top-0 right-20 w-max p-1 bg-white text-black text-[9px] rounded-md border border-solid border-black" 
+                                    *ngIf="isHovered && mail === oncall.user_email && isCurrent && isPrimary">
+                                    <div *ngIf="!isCustomerEnabled()">Mail: {{ oncall.user_email }} </div>
+                                    <div class="text-[8px]">
+                                        <div>Name: {{ oncall.user_first_name }} {{ oncall.user_name }}</div>
+                                        <div *ngIf="!isCustomerEnabled()">Phone: {{ oncall.user_phone }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>    
+                        
+                    </div>
+                </div>
+                <div class="nav-planning-item-right">
+                    <div *ngFor="let oncall of onCallsThisWeek">
+                        <ng-container *ngIf="oncall.emergency_backup">
+                            <div class="relative mx-1" 
+                                (mouseleave)="isHovered = false && isCurrent = false && isEmergency = false && mail= ''" 
+                                (mouseenter)="isHovered = true && isCurrent = true && isEmergency = true && mail= oncall.user_email"
+                            >
+                                <div class="icon-user"
+                                    [ngClass]="{
+                                        'bg-[#E3D617]': oncall.skill_id === 1,
+                                        'bg-[#17AFE3]': oncall.skill_id === 2,
+                                        'bg-[#7DC37D]': oncall.skill_id === 3,
+                                        'bg-[#D3D3D3]': oncall.skill_id !== 1 && oncall.skill_id !== 2 && oncall.skill_id !== 3
+                                    }"
+                                >
+                                <h1><span>{{ oncall.user_first_name.charAt(0) }}{{ oncall.user_name.charAt(0) }}{{ oncall.user_name.charAt(oncall.user_name.length - 1) }}</span></h1>
+                                </div>
+                                <div class="z-50 absolute top-0 right-6 w-max p-1 bg-white text-black text-[9px] rounded-md border border-solid border-black" 
+                                    *ngIf="isHovered && mail === oncall.user_email && isCurrent && isEmergency">
+                                    <div *ngIf="!isCustomerEnabled()">Mail: {{ oncall.user_email }} </div>
+                                    <div class="text-[8px]">
+                                        <div>Name: {{ oncall.user_first_name }} {{ oncall.user_name }}</div>
+                                        <div *ngIf="!isCustomerEnabled()">Phone: {{ oncall.user_phone }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>                            
+                    </div>
+                </div>  
+            </div>
+            <div class="nav-planning-item-gray">
+                <div>
+                    <h2 class="nav-planning-item-title">Week {{nextWeek}}</h2> 
+                </div>
+                <div class="flex items-center">
+                    <div *ngFor="let oncall of onCallsNextWeek">
+                        <ng-container *ngIf="oncall.primary_backup">
+                            <div class="relative ml-1" 
+                                (mouseleave)="isHovered = false && isNext = false && isPrimary = false && mail= ''" 
+                                (mouseenter)="isHovered = true && isNext = true && isPrimary = true && mail= oncall.user_email"
+                            >
+                                <div class="icon-user"
+                                    [ngClass]="{
+                                        'bg-[#E3D617]': oncall.skill_id === 1,
+                                        'bg-[#17AFE3]': oncall.skill_id === 2,
+                                        'bg-[#7DC37D]': oncall.skill_id === 3,
+                                        'bg-[#D3D3D3]': oncall.skill_id !== 1 && oncall.skill_id !== 2 && oncall.skill_id !== 3
+                                    }"
+                                >
+                                <h1><span>{{ oncall.user_first_name.charAt(0) }}{{ oncall.user_name.charAt(0) }}{{ oncall.user_name.charAt(oncall.user_name.length - 1) }}</span></h1>
+                                </div>
+                                <div class="z-50 absolute bottom-0 right-20 w-max p-1 bg-white text-black text-[9px] rounded-md border border-solid border-black" 
+                                    *ngIf="isHovered && mail === oncall.user_email && isNext && isPrimary">
+                                    <div *ngIf="!isCustomerEnabled()">Mail: {{ oncall.user_email }} </div>
+                                    <div class="text-[8px]">
+                                        <div>Name: {{ oncall.user_first_name }} {{ oncall.user_name }}</div>
+                                        <div *ngIf="!isCustomerEnabled()">Phone: {{ oncall.user_phone }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>                                                   
+                    </div>
+                </div>
+                <div class="nav-planning-item-right">
+                    <div *ngFor="let oncall of onCallsNextWeek">
+                        <ng-container *ngIf="oncall.emergency_backup">
+                            <div class="relative mx-1" 
+                                (mouseleave)="isHovered = false && isNext = false && isEmergency = false && mail= ''" 
+                                (mouseenter)="isHovered = true && isNext = true && isEmergency = true && mail= oncall.user_email"
+                            >
+                                <div class="icon-user"
+                                    [ngClass]="{
+                                        'bg-[#E3D617]': oncall.skill_id === 1,
+                                        'bg-[#17AFE3]': oncall.skill_id === 2,
+                                        'bg-[#7DC37D]': oncall.skill_id === 3,
+                                        'bg-[#D3D3D3]': oncall.skill_id !== 1 && oncall.skill_id !== 2 && oncall.skill_id !== 3
+                                    }"
+                                >
+                                    <h1><span>{{ oncall.user_first_name.charAt(0) }}{{ oncall.user_name.charAt(0) }}{{ oncall.user_name.charAt(oncall.user_name.length - 1) }}</span></h1>
+                                </div>
+                                <div class="z-50 absolute bottom-0 right-6 w-max p-1 bg-white text-black text-[9px] rounded-md border border-solid border-black" 
+                                    *ngIf="isHovered && mail === oncall.user_email && isNext && isEmergency">
+                                    <div *ngIf="!isCustomerEnabled()">Mail: {{ oncall.user_email }}</div>
+                                    <div class="text-[8px]">
+                                        <div>Name: {{ oncall.user_first_name }} {{ oncall.user_name }}</div>
+                                        <div>Phone: {{ oncall.user_phone }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>                                 
+                    </div>  
+                </div>
+            </div>
+        </div>
+        <button *ngIf="isTechnnavChildRoute()" [disabled]="isSalesSupportDisabled()" (click)="toggleVisibility()" class="header-buttons-item">
+            {{ 'newTicket' | translate }}
+            <img
+                src="assets/icons/create-ticket.png"
+                alt="Create ticket button"
+                class="w-6 h-6 ml-4"
+            />
+        </button>
+    </div>    
+</nav>
+
+<div *ngIf="isMenuVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isMenuVisible" class="menu-hamburger">
+    <div class="menu-hamburger-flex" (click)="toggleMenu()">
+        <img [src]="menuImgSrc" alt="logo" class="nav-menu-icon mr-2" />
+        <h2 class="nav-menu-title">Menu</h2>
+    </div>
+    <hr class="menu-hr">
+    <div>
+        <button class="menu-hamburger-flex" routerLink="/" (click)="toggleMenu()">
+            <img alt="home" src="assets/icons/dash.png" class="nav-menu-icon mr-2" />
+            <h2 class="nav-menu-title ">{{ 'dashboard' | translate }}</h2>
+        </button>
+    </div>   
+    <hr class="menu-hr">
+    <div>
+        <button class="menu-title py-[.5rem]" [disabled]="isSalesSupportDisabled()" (click)="createTicket()">{{ 'createTicket' | translate }}</button>
+        <h2 class="menu-title py-[.5rem]" routerLink="/statistique" (click)="toggleMenu()">{{ 'statisticsTickets' | translate }}</h2>
+        <h2 class="menu-title py-[.5rem]" routerLink="/tickets" (click)="toggleMenu()">{{ 'listingTickets' | translate }}</h2>
+    </div>   
+    <hr class="menu-hr">
+    <div>
+        <h2 class="menu-title py-[.5rem]" routerLink="/document" (click)="toggleMenu()">Document search</h2>
+        <h2 class="menu-title py-[.5rem]" routerLink="/customer" (click)="toggleMenu()">{{ 'searchClient' | translate }}</h2>
+    </div>
+    <hr class="menu-hr">
+    <div>
+        <h2 class="menu-title py-[.5rem]" *ngIf="isManagerEnabled()" routerLink="/config" (click)="toggleMenu()">Congif and on-call schedule</h2>
+        <h2 class="menu-title py-[.5rem]" routerLink="/calendrier" (click)="toggleMenu()">Calendrier</h2>
+    </div>
+
+    <div class="menu-hamburger-logs custom-scrollbar">
+        <div class="menu-hamburger-logs-nav">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <g filter="url(#filter0_d_460_7564)">
+                    <circle cx="12" cy="8" r="8" fill="#FC1212"/>
+                </g>
+                <defs>
+                    <filter id="filter0_d_460_7564" x="0" y="0" width="24" height="24" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                        <feOffset dy="4"/>
+                        <feGaussianBlur stdDeviation="2"/>
+                        <feComposite in2="hardAlpha" operator="out"/>
+                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+                        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_460_7564"/>
+                        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_460_7564" result="shape"/>
+                    </filter>
+                </defs>
+            </svg>
+            <h1 class="menu-title" routerLink="/log" (click)="toggleMenu()">All</h1>
+        </div>
+        <div *ngFor="let log of lastAskedLog" class="flex items-center justify-between">
+            <h4 class="menu-hamburger-logs-title"><span class="font-bold">{{log.asked_log_type_label}}</span>, <span>#{{log.asked_ref}}</span>, <span class="font-bold">{{log.user_first_name.charAt(0)}}{{ log.user_name.charAt(0) }}{{ log.user_name.charAt(log.user_name.length - 1) }}</span>.</h4>
+            <h4 class="menu-hamburger-logs-title">{{ log.asked_log_created_date | date:'dd MMM yyyy HH:mm:ss' }}</h4>
+        </div>
+    </div>
+</div>
+
+<app-model-create [isCreateTicketVisible]="(isCreateTicketVisible$ | async) ?? false"></app-model-create>

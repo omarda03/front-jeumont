@@ -1,0 +1,110 @@
+<div class="grid lg:grid-cols-2 font-inter text-sm font-semibold">
+    <div class="container-config h-[25rem]">
+        <div class="config-title">
+            <h1>Add or edit ship</h1>
+        </div>
+        <form [formGroup]="form" (ngSubmit)="submitFormShip()" class="p-4 rounded-b-[10px] flex flex-col justify-between h-[80%]">
+            <div>
+                <div class="grid grid-cols-2">
+                    <div class="flex flex-col justify-center items-center mb-2">
+                        <label class="config-title-ticket">Name</label>
+                        <input formControlName="ship_name" type="text" placeholder="ship name" class="w-[15rem] p-1 font-normal border border-solid border-[#E30039]" />
+                    </div>
+                    <div class="flex flex-col justify-center items-center mb-2">
+                        <label class="config-title-ticket">Description</label>
+                        <input formControlName="ship_description" type="text" placeholder="ship description" class="w-[15rem] p-1 font-normal border border-solid border-[#E30039]" />
+                    </div>
+                </div>
+                <div class="grid grid-cols-2">
+                    <div class="flex flex-col justify-center items-center mb-2">
+                        <label class="config-title-ticket">User</label>
+                        <select formControlName="user_uuid" class="w-[15rem] p-1 font-normal border border-solid border-[#E30039]">
+                            <!--
+                                <option value="">None</option>
+                            -->
+                            <option *ngFor="let user of users" [value]="user.user_uuid">{{ user.user_name }} || {{ user.user_first_name }}</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col justify-center items-center mb-2">
+                        <label class="config-title-ticket">Fleet</label>
+                        <select formControlName="fleet_id" class="w-[15rem] p-1 font-normal border border-solid border-[#E30039]">
+                            <!--
+                                <option value="0">None</option>
+                            -->
+                            <option *ngFor="let fleet of fleets" [value]="fleet.fleet_id">{{ fleet.fleet_name }}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="flex justify-center items-center">
+                    <button class="flex items-center justify-center bg-custom mr-2 text-black rounded-[10px] border border-solid border-black py-2 px-8">
+                        <img src="assets/icons/save.png" class="w-5 h-5 mr-2" />
+                        {{ selectedShip ? 'Edit' : 'Add'}}
+                    </button>
+                    <button
+                        (click)="cancelCreationShip()"
+                        class="flex items-center justify-center bg-[#D9D9D9] text-black rounded-[10px] border border-solid border-black py-2 px-8"
+                    >
+                        <img src="assets/icons/cancel.png" class="w-5 h-5 mr-2" />
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="container-config h-[25rem]">
+        <div class="config-title">
+            <h1>Load existing ship</h1>
+        </div>
+        <form [formGroup]="formCheck" class="p-4 rounded-b-[10px] flex flex-col items-center justify-between h-[80%]">
+            <div class="flex flex-col justify-center items-center">
+                <select [(ngModel)]="selectedShip" [ngModelOptions]="{standalone: true}" (change)="updateFormValues()" class="p-1 font-normal border border-solid border-[#E30039] w-[400px]">
+                    <!--
+                        <option [ngValue]="null">None</option>
+                    -->
+                    <option *ngFor="let ship of ships" [ngValue]="ship">{{ ship.ship_name }}</option>
+                </select>                
+            </div>
+            <div *ngIf="selectedShip" class="flex justify-center items-center">
+                <button
+                    (click)="toggleDeleteShip()"
+                    class="flex items-center justify-center bg-[#D9D9D9] text-black rounded-[10px] border border-solid border-black py-2 px-8"
+                >
+                    <img src="assets/icons/delete.png" class="w-4 h-5 mr-2" />
+                    Delete
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div *ngIf="isDeleteShipVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isDeleteShipVisible" class="absolute w-[450px] top-1/3 left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-black bg-[#D9D9D9] z-50 shadow-lg ">
+    <div class="flex justify-between bg-custom text-white py-3 px-4 rounded-t-[20px]">
+        <div></div>
+        <div><h1 class="mb-1">Delete ship</h1></div>
+        <div><img (click)="toggleDeleteShip()" src="assets/icons/close.png" class="w-6 h-6 cursor-pointer"/></div>
+    </div>
+    <div class="flex justify-center items-center py-8">
+        <h2 class="text-lg font-semibold">Are you sure you want to delete this ship ?</h2>
+    </div>
+    <div class="flex justify-around px-6 mb-2">
+        <button
+            class="flex items-center justify-center border border-solid border-black rounded-[10px] mr-6 bg-custom text-black font-bold shadow-lg py-1 px-6"
+            (click)="deleteShip()"
+        >
+            <img src="assets/icons/save.png" class="mr-2" />
+            Confirm
+        </button>
+        <button
+            class="flex items-center justify-center border border-solid border-black rounded-[10px] bg-[#FFFFFF] text-black font-bold shadow-lg py-1 px-6"
+            (click)="toggleDeleteShip()"
+        >
+            <img src="assets/icons/cancel.png" class="mr-2 w-6 h-6" />
+            Cancel
+        </button>
+    </div>
+</div>
+
+<app-popup *ngIf="isVisible" [error]="isError" [popupText]="text"></app-popup>

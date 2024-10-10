@@ -1,0 +1,23 @@
+{
+    "welcome": "Welcome",
+    "french": "French",
+    "english": "Anglais",
+    "language": "Language selection",
+    "preferred": "Select your preferred language :",
+    "whichkindTicket": "Which kind of ticket do you want to create?",
+    "newTicket": "New ticket",
+    "createTicket": "Create a ticket",
+    "statisticsTickets": "Tickets statistics",
+    "listingTickets": "Tickets listing",
+    "searchDocument": "Document search",
+    "searchClient": "Client search",
+    "config": "Config and on-call schedule", 
+    "filter": "Filter",
+    "export": "Export",
+    "sort": "Sort by",
+    "languageChange": "Change language",
+    "dashboard": "Dashboard"
+
+}
+
+  

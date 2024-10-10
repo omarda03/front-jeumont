@@ -1,0 +1,308 @@
+<form [formGroup]="form">
+    <div class="container-page">
+        <div class="container-creation container-select-ships col-span-3">
+            <div class="flex-container-column">
+                <img alt="user" src="assets/icons/user.png" class="logo-user" />
+                <select (change)="changeUser()" formControlName="customer_uuid" class="creation-item-select my-2">
+                    <!--
+                        <option value="">None</option>
+                    -->
+                    <option *ngFor="let customer of customers" [value]="customer.customer_uuid">{{ customer.customer_name }}</option>
+                </select>
+                <div *ngIf="customerUuidControl.hasError('required')" class="page-message-erreur">
+                    The customer is required *.
+                </div>
+            </div>
+            <div class="flex-container-column">
+                <img alt="fleet" src="assets/icons/fleet.png" class="logo-ships" />
+                <select (change)="changeFleet()" formControlName="fleet_id" class="creation-item-select my-2">
+                    <!--
+                        <option value="">None</option>
+                    -->
+                    <option *ngFor="let fleet of fleets" [value]="fleet.fleet_id">{{ fleet.fleet_name }}</option>
+                </select>
+                <div *ngIf="fleetIdControl.hasError('required')" class="page-message-erreur">
+                    The fleet is required *.
+                </div>
+            </div>
+            <div class="flex-container-column">
+                <img alt="ship" src="assets/icons/ship.png" class="logo-ships" />
+                <select formControlName="ship_uuid" class="creation-item-select my-2">
+                    <!--
+                        <option value="">None</option>
+                    -->
+                    <option *ngFor="let ship of ships" [value]="ship.ship_uuid">{{ ship.ship_name }}</option>
+                </select>
+                <div *ngIf="shipUuidControl.hasError('required')" class="page-message-erreur">
+                    The ship is required *.
+                </div>
+            </div>
+        </div>
+        
+        <div class="container-creation container-select-ships col-span-3">
+            <div></div>
+            <div class="flex-container-column">
+                <h1 class="page-title">PRFS</h1>
+                <select formControlName="prfs_link" class="creation-item-select my-2">
+                    <!--
+                        <option value="">None</option>
+                    -->
+                    <option *ngFor="let prfs of prfss" [value]="prfs.asked_uuid">{{ prfs.asked_ref }}</option>
+                </select>
+            </div>
+            <div></div>
+        </div>
+        
+
+        <div class="mt-2 text-sm grid grid-cols-3 gap-4">
+            <div>
+                <h2 *ngIf="askedDescriptionControl.hasError('required')" class="page-message-erreur">The asked description is required *.</h2>
+                <h2 *ngIf="askedDescriptionControl.hasError('minlength')" class="page-message-erreur">The asked description must be at least 32 characters long *.</h2>
+                <textarea formControlName="asked_description" class="creation-item-textarea" placeholder="Description *"></textarea>
+            </div>
+            <div>
+                <div class="flex-container-between my-1">
+                    <h1 class="creation-title">Purchase request ID (CRM) :</h1>
+                    <input type="text" formControlName="prma_id_crm" class="creation-item-input-prma" placeholder="purchase request id (CRM)" />
+                </div>
+                <div class="flex-container-between my-1">
+                    <h1 class="creation-title">Project number :</h1>
+                    <select formControlName="prma_project_number" class="creation-item-input-prma">
+                        <!--
+                            <option value="">None</option>
+                        -->
+                        <option *ngFor="let project of projects" [value]="project.project_uuid" >{{ project.project_ref }}</option>
+                    </select>
+                </div>
+                <div class="flex-container-between my-1">
+                    <h1 class="creation-title">Purchase order (PO) :</h1>
+                    <input type="text" formControlName="prma_purchase_order_po" placeholder="purchase order (PO)" class="creation-item-input-prma" />
+                </div>
+            </div>
+            <div>
+                <div class="flex-container-between my-1">
+                    <h1 class="creation-title">Purchase request date :</h1>
+                    <input formControlName="prma_date" type="date" class="creation-item-input-prma" />
+                </div>
+                <div class="flex-container-between my-1">
+                    <h1 class="creation-title">Quotation price total :</h1>
+                    <input type="text" formControlName="prma_quotation_price_total" placeholder="quotation price total" class="creation-item-input-prma" />
+                </div>
+                <div class="flex-container-between my-1">
+                    <h1 class="creation-title">Requested delivery date:</h1>
+                    <input type="date" formControlName="prma_date_estimated_of_receipt" class="creation-item-input-prma" />
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="errorMessage" class="text-left text-[#FF0000] capitalize my-2 text-sm font-semibold">
+            {{ errorMessage }}
+        </div>
+        <div class="flex-container-center">
+            <div class="spare-parts">
+                <div class="flex items-center justify-around">
+                    <h1 class="page-title">Spare parts ( {{ spare_parts.length }} )</h1>
+                    <h1 class="page-title">Purchase order ( CA )</h1>
+                </div>
+                <div class="bg-[#cc4264] border border-solid border-red-600 flex flex-col items-center overflow-y-scroll h-[14rem] p-[.5rem] custom-scrollbar">
+                    <div *ngFor="let sparepart of spare_parts; let i = index" class="w-[100%] bg-[#e4738f] p-[.5rem] mb-1 flex-container-center">
+                        <button (click)="deleteSparePart(i)">
+                            <img
+                                src="assets/icons/minus.png"
+                                class="header-buttons-item-logo"
+                            />
+                        </button>
+                        <div class="mx-2">
+                            <div class="flex-container-between my-1">
+                                <h1 class="creation-title mr-2">Spare :</h1>
+                                <h2 class="creation-title-content text-white">{{ sparepart.piece.piece_ifs }} ({{ sparepart.piece.piece_ref }}) -{{ sparepart.piece.piece_label }}</h2>
+                            </div>
+                            <div class="flex-container-between my-1">
+                                <h1 class="creation-title mr-2">Quantity :</h1>
+                                <h2 class="creation-title-content text-white">{{ sparepart.quantity}}</h2>
+                            </div>
+                        </div>
+                        <div class="container-creation">
+                            <div class="flex-container-between my-1">
+                                <h1 class="creation-title mr-2">Purchase order number :</h1>
+                                <h2 class="creation-title-content">{{ sparepart.purchase_order_number }}</h2>
+                            </div>
+                            <div class="flex-container-between my-1">
+                                <h1 class="creation-title mr-2">Expected date :</h1>
+                                <h2 class="creation-title-content">{{ sparepart.expected_date }}</h2>
+                            </div>
+                            <div class="flex-container-between my-1">
+                                <h1 class="creation-title mr-2">Status CA :</h1>
+                                <h2 class="creation-title-content">{{ sparepart.status_ifs }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-[100%] bg-[#e4738f] p-[.5rem] mb-1 flex-container-center">
+                        <div class="mx-2">
+                            <div class="flex-container-between my-1">
+                                <h1 class="creation-title mr-2">Spare :</h1>
+                                <select [(ngModel)]="piece_uuid" [ngModelOptions]="{standalone: true}" class="creation-item-select-prma">
+                                    <!--
+                                        <option value="">None</option>
+                                    -->
+                                    <option *ngFor="let piece of equipementsinterne" [value]="piece.piece_uuid" >{{ piece.piece_ifs }} ({{ piece.piece_ref }}) -{{ piece.piece_label }}</option>
+                                </select>
+                            </div>
+                            <div class="flex-container-between my-1">
+                                <h1 class="creation-title mr-2">Quantity :</h1>
+                                <input type="number" [(ngModel)]="quantity" [ngModelOptions]="{standalone: true}" class="creation-item-input-prma" />
+                            </div>
+                        </div>
+                        <div class="container-creation">
+                            <div class="flex-container-between my-1">
+                                <h1 class="creation-title mr-2">Purchase order number :</h1>
+                                <input type="text" [(ngModel)]="purchase_order_number" [ngModelOptions]="{standalone: true}" placeholder="purchase order number" class="creation-item-input-prma" />
+                            </div>
+                            <div class="flex-container-between my-1">
+                                <h1 class="creation-title mr-2">Expected date :</h1>
+                                <input type="date" [(ngModel)]="expected_date" [ngModelOptions]="{standalone: true}" class="creation-item-input-prma" />
+                            </div>
+                            <div class="flex-container-between my-1">
+                                <h1 class="creation-title mr-2">Status CA :</h1>
+                                <input type="text" [(ngModel)]="status_ifs" [ngModelOptions]="{standalone: true}" placeholder="status CA" class="creation-item-input-prma" />
+                            </div>
+                        </div>
+                    </div>
+                    <button
+                        class="flex justify-center items-center text-black"
+                    >
+                        <img 
+                            (click)="addToSpareParts()"
+                            src="assets/icons/plus.png"
+                            class="header-buttons-item-logo mt-2"
+                        />
+                    </button>
+                </div>
+            </div>
+            <div class="purchase_request flex-container-column">
+                <h1 class="page-title">Purchase request ( DA )</h1>
+                <div class="container-creation">
+                    <div class="flex-container-between my-1">
+                        <h1 class="creation-title mr-4">Purchase request number :</h1>
+                        <input type="text" formControlName="prma_number_da" placeholder="purchase request number" class="creation-item-input-prma" />
+                    </div>
+                    <div class="flex-container-between my-1">
+                        <h1 class="creation-title mr-4">Release date DA :</h1>
+                        <input type="date" formControlName="prma_release_date_da" class="creation-item-select-prma" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-creation grid grid-cols-5 gap-4">
+            <div class="flex items-center">
+                <img src="assets/icons/clip.png" class="header-buttons-item-logo"/>
+                <h1 class="page-title"><span>Attachments: </span>{{ numberOfAttachments }}</h1>
+            </div>
+            <div class="col-span-2 page-attachements-info custom-scrollbar">   
+                <div class="flex-container-between">
+                    <h1 class="page-title">Name</h1>
+                    <h1 class="page-title">Size</h1>
+                </div>      
+                <div class="flex-container-between" *ngFor="let attachment of attachments">
+                    <h1 class="page-title-element">{{ attachment.name }}</h1>
+                    <h1 class="page-title-element">{{ attachment.size }}</h1>
+                </div>                                           
+            </div>
+            <div 
+                (drop)="onDrop($event)"
+                (dragover)="onDragOver($event)" 
+                class="col-span-2 page-attachements-drop"
+            >
+                <div class="flex justify-center">
+                    <label for="fileInput" class="page-title-element">Drag your file here to start uploading</label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex-1 border-t-2 border-[#E30039]"></div>
+                    <h1 class="text-center text-base md:text-lg font-semibold px-2"> Or </h1>
+                    <div class="flex-1 border-t-2 border-[#E30039]"></div>
+                </div>
+                <div class="flex justify-center">
+                    <button (click)="toggleBrowsefiles()" class="rounded-[10px] bg-custom text-black py-1 px-8">Browse files</button>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="isCreationEnabled()" class="grid grid-cols-2 gap-4">
+            <button [disabled]="loading" (click)="submitForm()" class="button-save text-black">
+                <span *ngIf="!loading">Create ticket</span>
+                <span *ngIf="loading" class="flex items-center">
+                    <svg class="animate-spin h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.963 7.963 0 014 12H0c0 4.418 3.582 8 8 8v-4.01zm13.196-1.383A10.001 10.001 0 0021.22 12h-4.02a6.001 6.001 0 11-6.001-6h-2a8.001 8.001 0 108.177 5.908l1.018 1.018z"></path>
+                    </svg>
+                    Loading...
+                </span>
+            </button>
+            <button type="button" class="button-cancel text-black" (click)="cancel()">Cancel</button>
+        </div>
+    </div>
+</form>
+<app-popup *ngIf="isVisible" [popupText]="text"></app-popup>
+
+<div *ngIf="isBrowsefiles" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isBrowsefiles" class="font-bold absolute top-[2rem] left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-[#E30039] bg-white z-50 py-2 shadow-lg ">
+    <div class="flex justify-between px-4 py-1 border-dashed border-b-2">
+        <div></div>
+        <div>
+            <h1 class="font-bold mb-1">Browse files</h1>
+        </div>
+        <div>
+            <img
+                (click)="toggleBrowsefiles()"
+                alt="Icon close"
+                src="assets/icons/close.png"
+                class="w-4 h-4 cursor-pointer"
+            />
+        </div>
+    </div>   
+    <div class="px-6 flex flex-col py-8">
+        <div class="my-2">
+            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="OfferReceivedInput" (change)="onFileChange($event, 'Offer_Received')" multiple>
+            <label for="OfferReceivedInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Offer received</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="OfferSentInput" (change)="onFileChange($event, 'Offer_Sent')" multiple>
+            <label for="OfferSentInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Offer Sent</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="poInput" (change)="onFileChange($event, 'Purchase_Order')" multiple>
+            <label for="poInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Purchase Order</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="oeiInput" (change)="onFileChange($event, 'OEI')" multiple>
+            <label for="oeiInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Ordre d’execution interne</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="MaterialReceptionInput" (change)="onFileChange($event, 'Material_Reception')" multiple>
+            <label for="MaterialReceptionInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Material reception</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="ssInput" (change)="onFileChange($event, 'Shipping_Slips')" multiple>
+            <label for="ssInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Shipping slips</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="srInput" (change)="onFileChange($event, 'Receipt_Slip')" multiple>
+            <label for="srInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Receipt slip</h1>    
+            </label>
+        </div>
+    </div>
+</div>

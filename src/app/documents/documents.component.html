@@ -1,0 +1,121 @@
+<div class="container-page">
+    <div>
+        <div class="px-4 text-sm flex items-center justify-start mb-2">
+            <h2 class="page-title">Advanced research</h2>
+
+            <img (click)="togglePlusClick()" *ngIf="plusClick" src="assets/icons/plus.png" class="ml-2 cursor-pointer header-buttons-item-logo"  />
+            <div (click)="togglePlusClick()" *ngIf="!plusClick" class="header-buttons-item-logo cursor-pointer ml-2 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="1" viewBox="0 0 15 1" fill="none">
+                    <line y1="-0.5" x2="14.1421" y2="-0.5" transform="matrix(1 0 0 -1 0 0)" stroke="black"/>
+                </svg>
+            </div>
+        </div>
+        <div *ngIf="!plusClick" class="my-2 text-sm">
+            <div class="flex items-center justify-around mb-2">
+                <h1 class="page-title-element">Created</h1>
+                <input
+                    class="creation-item-input-prma"
+                    type="date"
+                    [(ngModel)]="startDate"
+                />
+                <input
+                    class="creation-item-input-prma"
+                    type="date"
+                    [(ngModel)]="endDate"
+                />
+            </div>
+            <div class="flex items-center justify-around mb-2">
+                <div class="flex flex-col items-center px-1">
+                    <h1 class="page-title-element">Contains only</h1>
+                    <input type="text" placeholder="contains" [(ngModel)]="containsText" class="creation-item-input-prma" />
+                </div>
+                <div class="flex flex-col items-center px-1">
+                    <h1 class="page-title-element">Does not contain</h1>
+                    <input type="text" placeholder="not contain" [(ngModel)]="doesNotContainText" class="creation-item-input-prma" />
+                </div>
+                <div class="flex flex-col items-center px-1">
+                    <h1 class="page-title-element">Linked words</h1>
+                    <input type="text" placeholder="words" [(ngModel)]="linkedWordsText" class="creation-item-input-prma" />
+                </div>
+                <div class="flex flex-col items-center px-1">
+                    <h1 class="page-title-element">Category</h1>
+                    <select [(ngModel)]="selectedCategory" class="creation-item-select-prma">
+                        <!--
+                            <option value='undefined'>None</option>
+                        -->
+                        <option *ngFor="let categorie of categories" [value]="categorie.cat_id">{{categorie.cat_label}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex items-center justify-around mb-2">
+                <h2 class="page-title-element">Size of document between</h2>
+                <input type="text" placeholder="min" [(ngModel)]="minSize" class="creation-item-input-prma" />
+                <h2 class="page-title-element">and</h2>
+                <input type="text" placeholder="max" [(ngModel)]="maxSize" class="creation-item-input-prma" />
+                <h2 class="page-title-element">Octets</h2>
+                <div class="flex justify-center items-center px-1">
+                    <button (click)="search()" class="header-buttons-item">Search</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <h2 class="documents-title-table page-title">Document Interne</h2>
+        <div>
+            <div *ngIf="isLoading; else documentsinterneList" class="flex items-center justify-center h-full bg-white">
+                <svg class="animate-spin h-5 w-5 mr-3 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.878 3.2 8.062l2.83-2.83zM12 20c-3.042 0-5.878-1.135-8.062-3.2l-2.83 2.83A7.962 7.962 0 0012 24h.001c4.418 0 8-3.582 8-8V12h-4v8z"></path>
+                </svg>
+                <p class="text-gray-600">Loading tickets...</p>
+            </div>
+            <ng-template #documentsinterneList>
+                <table class="documents-table-t custom-scrollbar">
+                    <thead class="documents-thead">
+                        <tr>
+                            <th class="documents-thead-element">Ref</th>
+                            <th class="documents-thead-element">Document</th>
+                            <th class="documents-thead-element">Type</th>
+                            <th class="documents-thead-element">Category</th>
+                            <th class="documents-thead-element">User</th>
+                            <th class="documents-thead-element">Created on</th>
+                            <th class="documents-thead-element">Last Update on</th>
+                            <th class="documents-thead-element">Size</th>
+                            <th class="documents-thead-element">Localisation</th>
+                        </tr>
+                    </thead>
+                    <tbody class="documents-thead">
+                        <tr *ngFor="let document of documentsinterne" class="documents-tbody-tr">
+                            <td class="documents-tbody-element">{{ document.doc_ref }}</td>
+                            <td class="documents-tbody-element">{{ document.doc_description }}</td>
+                            <td class="documents-tbody-element">{{ document.doc_type }}</td>
+                            <td class="documents-tbody-element">{{ document.Categorie.cat_label }}</td>
+                            <td class="documents-tbody-element">{{ document.User.user_name }} {{ document.User.user_first_name }}</td>
+                            <td class="documents-tbody-element">{{ document.doc_created_date | date:'yyyy MMM dd HH:mm:ss' }}</td>
+                            <td class="documents-tbody-element">{{ document.doc_updated_date | date:'yyyy MMM dd HH:mm:ss' }}</td>
+                            <td class="documents-tbody-element">{{ document.doc_size }}o</td>
+                            <td class="flex items-center justify-center documents-tbody-element">
+                                <a class="page-attachements-drop-button mr-2" [href]="document.doc_localisation_numerique">Numerique</a>
+                                <a class="page-attachements-drop-button" [href]="document.localisation_espace_reseau">Reseau</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </ng-template>
+        </div>
+        <div class="pagination">
+            <button (click)="changePage(-1)" class="pagination-button">Previous</button>
+
+            <ng-container *ngFor="let pageNumber of getPageNumbers(currentPage, totalPages)">
+                <button *ngIf="pageNumber !== '...'" [class.active]="pageNumber === currentPage" (click)="goToPage(pageNumber)" class="pagination-button">{{ pageNumber }}</button>
+                <span *ngIf="pageNumber === '...'">{{ pageNumber }}</span>
+            </ng-container>
+
+            <input [(ngModel)]="currentPage" (keyup.enter)="goToPage(currentPage)" class="pagination-input" type="number" min="1" [max]="totalPages" />
+
+            <button (click)="changePage(1)" class="pagination-button">Next</button>
+        </div>
+    </div>
+</div>

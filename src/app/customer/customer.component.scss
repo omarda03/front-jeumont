@@ -1,0 +1,46 @@
+button.active {
+border-radius: 10px;
+border: 1px dashed rgba(0, 0, 0, 0.50);
+background: #C8E1FF;
+padding: 2px;
+width: 80px;
+}
+
+.circle {
+width: 12px;
+height: 12px;
+display: inline-block;
+border-radius: 50%;
+margin-right: 6px;
+}
+
+.open {
+background-color: #09EB63; /* Circle color for open */
+}
+
+.closed {
+background-color: #ED0808; /* Circle color for closed */
+}
+
+.filter {
+color: white;
+background-color: #E30039;
+padding: 3px 6px;
+border: 1px solid black;
+border-radius: 10px;
+}
+
+.selected {
+color: white;
+background-color: #E30039;
+}
+.pagination {
+    display: flex;
+    // justify-content: space-between;
+    align-items: center;
+}
+
+.pagination-button,
+.pagination-input {
+    margin: 0 0.2rem; /* Adjust spacing as needed */
+}

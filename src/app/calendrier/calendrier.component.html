@@ -1,0 +1,15 @@
+<div class="container-page">
+    <div *ngIf="showCalendar; else loading">
+        <div class="rounded-[10px]"><app-schedule-test [addToBackUp]="addToBackUp" [addToEvents]="addToEvents"></app-schedule-test></div>
+    </div>
+      
+    <ng-template #loading>
+        <div class="flex items-center justify-center h-[100vh]">
+            <svg class="animate-spin h-5 w-5 mr-3 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.878 3.2 8.062l2.83-2.83zM12 20c-3.042 0-5.878-1.135-8.062-3.2l-2.83 2.83A7.962 7.962 0 0012 24h.001c4.418 0 8-3.582 8-8V12h-4v8z"></path>
+            </svg>
+            <p class="text-gray-600">Loading calendar ...</p>
+        </div>
+    </ng-template>
+</div>

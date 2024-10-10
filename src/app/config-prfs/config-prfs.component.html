@@ -1,0 +1,77 @@
+<div class="grid grid-cols-2 font-inter text-sm font-semibold">
+    <div class="container-config h-[25rem]">
+        <div class="config-title">
+            <h1>Update prfs</h1>
+        </div>
+        <div class="p-4 rounded-b-[10px] h-[80%] flex flex-col justify-between">
+            <div class="flex flex-col justify-center items-center">
+                <label class="config-title-ticket">Name</label>
+                <input
+                    *ngIf="asked"
+                    type="text"
+                    class="text-black p-3 font-normal w-[250px] border border-solid border-black"
+                    [(ngModel)]="asked.asked_ref"
+                    [formControl]="askedRefControl"
+                />
+                <div
+                    *ngIf="askedRefControl.invalid && (askedRefControl.dirty || askedRefControl.touched)"
+                    class="text-red-500"
+                >
+                    La référence ne peut pas dépasser 10 caractères.
+                </div>
+            </div>
+            <div class="flex  justify-center items-center">
+                <button [disabled]="!askedRefControl.valid" (click)="submit()" class="flex items-center justify-center bg-custom mr-2 text-black rounded-[10px] border border-solid border-black py-2 px-8">
+                    <img src="assets/icons/save.png" class="w-5 h-5 mr-2"/>
+                    Save
+                </button>
+                <button (click)="cancel()" class="flex items-center justify-center bg-[#D9D9D9] text-black rounded-[10px] border border-solid border-black py-2 px-8">
+                    <img src="assets/icons/cancel.png" class="w-5 h-5 mr-2"/>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="container-config">
+        <div class="config-title">
+            <h1>Prfs list</h1>
+        </div>
+        <div class="grid grid-cols-2 p-4 rounded-b-[10px]">
+            <div class="px-6">
+                <label class="config-title-ticket">Search</label>
+                <input
+                    type="text"
+                    class="p-2 border border-solid font-normal border-black"
+                    placeholder="search"
+                    [(ngModel)]="searchDescription"
+                    (change)="onSearchChange()"
+                />
+            </div>
+            <div class="px-6 overflow-hidden">
+                <label  class="config-title-ticket">List</label>
+                <div class="h-[17rem] p-[.5rem] border border-solid border-black overflow-y-scroll">
+                    <div *ngIf="isLoading; else ticketList" class="flex items-center justify-center h-full bg-white">
+                        <svg class="animate-spin h-5 w-5 mr-3 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.878 3.2 8.062l2.83-2.83zM12 20c-3.042 0-5.878-1.135-8.062-3.2l-2.83 2.83A7.962 7.962 0 0012 24h.001c4.418 0 8-3.582 8-8V12h-4v8z"></path>
+                        </svg>
+                        <p class="text-gray-600">Loading tickets...</p>
+                    </div>
+
+                    <ng-template #ticketList>
+                        <div *ngFor="let ticket of tickets; let i = index">
+                            <h1
+                                (click)="setAsked(ticket)"
+                                class="cursor-pointer config-ticket-list-item"
+                                [ngClass]="{'selected': ticket === asked}"
+                            >
+                                {{ ticket.asked_ref }}
+                            </h1>
+                        </div>
+                    </ng-template>
+                </div>
+            </div> 
+        </div>
+    </div>
+</div>
+<app-popup *ngIf="isVisible" [error]="isError" [popupText]="text"></app-popup>

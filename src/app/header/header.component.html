@@ -1,0 +1,120 @@
+<header class="header-container flex justify-between items-center p-4 bg-white shadow-md">
+    <!-- Bouton de déconnexion -->
+    <div *ngIf="shouldDisplayButtons()">
+        <img (click)="logout()" src="assets/icons/logout.png" alt="logout" class="header-logout"/>
+    </div>
+    
+    <!-- Logo centré et responsive -->
+<div class="flex justify-center items-center w-full">
+    <img src="assets/images/logo-j.png" alt="Logo Jeumont" class="header-logo max-h-12 md:max-h-16 object-contain" (click)="redirect()" />
+</div>
+
+    
+    <!-- Section pour les boutons ou le combo box -->
+    <div *ngIf="shouldDisplayButtons()" class="header-buttons flex items-center">
+        <!-- Afficher les boutons séparés uniquement sur les écrans de type desktop -->
+        <div class="header-buttons-admin hidden md:flex space-x-2" *ngIf="isDesktop">
+            <button (click)="toggleLangage()" class="mr-2 header-buttons-item">
+                <img src="assets/icons/langues.png" alt="logo" class="header-buttons-item-logo" />
+                {{ 'languageChange' | translate }}
+            </button>
+            <button (click)="toggleFeedback()" class="header-buttons-item">
+                <img src="assets/icons/feedback.png" alt="logo" class="header-buttons-item-logo" />
+                Feedback
+            </button>
+        </div>
+        
+        <!-- Combo box pour les écrans de téléphone -->
+        <div class="block md:hidden ml-4" *ngIf="!isDesktop">
+            <select class="bg-blue-500 text-white px-3 py-1 rounded" (change)="handleSelectChange($event)">
+                <option value="" disabled selected>Select option</option>
+                <option value="language">Change language</option>
+                <option value="feedback">Feedback</option>
+            </select>
+        </div>
+    </div>    
+</header>
+
+
+<hr class="menu-hr">
+
+<!-- Contenus supplémentaires restent inchangés (langue et feedback modals) -->
+
+
+<div *ngIf="isLanguageOverlayVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isLanguageOverlayVisible" class="font-inter font-bold absolute bottom-2 right-2 rounded-[10px] border border-solid border-[#E30039] bg-[#EEE] z-50 py-2 shadow-lg">
+    <div class="flex justify-end px-4">
+        <img
+            (click)="toggleLangage()" 
+            src="assets/icons/close.png"
+            alt="Icon close"
+            class="w-6 h-6 cursor-pointer"
+        />
+    </div>   
+    <div class="px-12 py-4">
+        <h2 class=" text-xl mb-4 text-center font-bold">{{ 'language' | translate }}</h2>
+        <hr class="border border-solid border-[#E30039]">
+    </div>  
+    <h2 class="px-4 mb-6">{{ 'preferred' | translate }}</h2> 
+    <div class="px-12 flex justify-between">
+        <div class="cursor-pointer bg-[#DBDBDB] mr-6 px-2 py-4 rounded-[10px]" (click)="changeLanguage('fr')">
+            <img src="assets/icons/fr.png" class="w-28 h-14 mb-8" />
+            <h2 class="text-center">{{ 'french' | translate }}</h2>
+        </div>
+        <div class="cursor-pointer bg-[#DBDBDB] px-2 py-4 rounded-[10px]" (click)="changeLanguage('en')">
+            <img src="assets/icons/en.png" class="w-28 h-14 mb-8" />
+            <h2 class="text-center">{{ 'english' | translate }}</h2>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isFeedbackVisible" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isFeedbackVisible" class="w-[350px] font-inter text-sm absolute top-1/4 left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-[#E30039] bg-white z-50 py-2 shadow-lg">
+    <div class="flex justify-between px-4 py-1">
+        <div></div>
+        <div><h1 class="font-bold mb-1 text-base">Feedback</h1></div>
+        <div>
+            <img
+                (click)="toggleFeedback()"
+                alt="icon close"
+                src="assets/icons/close.png"
+                class="w-4 h-4 cursor-pointer"
+            />
+        </div>
+    </div>
+
+    <form [formGroup]="feedbackForm" (ngSubmit)="onSubmit()">
+        <div class="px-6 py-4">
+            <div class="mb-2">
+                <input type="email" formControlName="email" placeholder="Email" class="placeholder-black mt-1 p-2 border border-[#E30039] rounded-[10px] w-full">
+            </div>
+            <div class="mb-2">
+                <input type="text" formControlName="subject" placeholder="Subject" class="text-black placeholder-black mt-1 p-2 border border-[#E30039] rounded-[10px] w-full">
+            </div>
+            <div class="mb-2">
+                <textarea formControlName="description" placeholder="Description" rows="3" class="text-black placeholder-black mt-1 p-2 border border-[#E30039] rounded-[10px] w-full"></textarea>
+            </div>
+            <div class="mb-4">
+                <div class="mt-1 flex items-center">
+                    <label for="fileInput" class="relative cursor-pointer bg-white rounded-md font-medium text-custom border border-[#E30039] px-4 py-2 inline-flex items-center">
+                        <span>Upload</span>
+                        <input id="fileInput" type="file" (change)="handleFileInput($event)" class="sr-only">
+                    </label>
+                    <span class="ml-3" id="selectedFileName">{{ selectedFile ? selectedFile.name : 'No file chosen' }}</span>
+                </div>
+            </div>
+            
+            <div class="flex justify-center items-center">
+                <button class="mr-2 text-black bg-custom border border-black py-2 px-8 text-base font-semibold rounded-[20px] flex justify-center">
+                    Send
+                    <img 
+                        alt=""
+                        src="assets/icons/send-plane.png"
+                        class="w-6 h-6 ml-2"
+                    />
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+

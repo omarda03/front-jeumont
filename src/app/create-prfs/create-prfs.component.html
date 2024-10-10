@@ -1,0 +1,281 @@
+<form [formGroup]="form">
+    <div class="container-page">
+        <div class="grid grid-cols-4 gap-4">
+            <div class="container-creation flex flex-col justify-between">
+                <div>
+                    <input type="radio" name="urgency" formControlName="urgency" [value]="true" />
+                    <label class="ml-2 page-title">24/7 Support</label>
+                </div>
+                <div>
+                    <input type="radio" checked name="urgency" formControlName="urgency" [value]="false" />
+                    <label class="ml-2 page-title">Standard support</label>
+                </div>
+            </div>            
+            <div class="container-creation container-select-ships col-span-3">
+                <div class="flex-container-column">
+                    <img alt="user" src="assets/icons/user.png" class="logo-user" />
+                    <select (change)="changeUser()" formControlName="customer_uuid" class="creation-item-select my-2">
+                        <!--
+                            <option value="">None</option>
+                        -->
+                        <option *ngFor="let customer of customers" [value]="customer.customer_uuid">{{ customer.customer_name }}</option>
+                    </select>
+                    <div *ngIf="customerUuidControl.hasError('required')" class="page-message-erreur">
+                        The customer is required *.
+                    </div>
+                </div>
+                <div class="flex-container-column">
+                    <img alt="fleet" src="assets/icons/fleet.png" class="logo-ships" />
+                    <select (change)="changeFleet()" formControlName="fleet_id" class="creation-item-select my-2">
+                        <!--
+                            <option value="">None</option>
+                        -->
+                        <option *ngFor="let fleet of fleets" [value]="fleet.fleet_id">{{ fleet.fleet_name }}</option>
+                    </select>
+                    <div *ngIf="fleetIdControl.hasError('required')" class="page-message-erreur">
+                        The fleet is required *.
+                    </div>
+                </div>
+                <div class="flex-container-column">
+                    <img alt="ship" src="assets/icons/ship.png" class="logo-ships" />
+                    <select formControlName="ship_uuid" class="creation-item-select my-2">
+                        <!--
+                            <option value="">None</option>
+                        -->
+                        <option *ngFor="let ship of ships" [value]="ship.ship_uuid">{{ ship.ship_name }}</option>
+                    </select>
+                    <div *ngIf="shipUuidControl.hasError('required')" class="page-message-erreur">
+                        The ship is required *.
+                    </div>
+                </div>
+            </div>
+        </div>
+      
+        <div class="container-creation container-select-infos">
+            <div class="flex-container-column">
+                <h1 class="page-title">Type</h1>
+                <select formControlName="skill_id" class="creation-item-select my-2">
+                    <!--
+                        <option value="0">None</option>
+                    -->
+                    <option *ngFor="let skill of skills" [value]="skill.skill_id">{{ skill.skill_label }}</option>
+                </select>
+            </div>
+            <div class="flex-container-column">
+                <h1 class="page-title">Type Effect</h1>
+                <select formControlName="effect_type_id" class="creation-item-select my-2">
+                    <!--
+                        <option value="0">None</option>
+                    -->
+                    <option *ngFor="let effectType of effectTypes" [value]="effectType.effect_type_id">{{ effectType.effect_type_label }}</option>
+                </select>
+            </div>     
+            <div class="flex-container-column">
+                <h1 class="page-title">PRFS</h1>
+                <select formControlName="asked_uuid" class="creation-item-select my-2">
+                    <!--
+                        <option value="">None</option>
+                    -->
+                    <option *ngFor="let prfs of prfss" [value]="prfs.asked_uuid">{{ prfs.asked_ref }}</option>
+                </select>
+                <button
+                    (click)="addAskedToTable()"
+                    class="flex items-center justify-center text-black text-xs pb-2"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+                        <rect x="12.5" y="3" width="3" height="23" fill="black"/>
+                        <rect x="25.1355" y="12.3625" width="3" height="23" transform="rotate(90 25.1355 12.3625)" fill="black"/>
+                    </svg>
+                    Add PRFS
+                </button>
+                <ul class="mb-2">
+                    <li *ngFor="let prfs of prfssAdded; let i = index">
+                        <button (click)="removeAsked(i)" class="text-black flex justify-center items-center">
+                            <span class="mr-2">{{ prfs.asked_ref }}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <rect y="5.0481" width="7.13924" height="25.8798" transform="rotate(-45 0 5.0481)" fill="black"/>
+                                <rect x="18.2998" width="7.13924" height="25.8798" transform="rotate(45 18.2998 0)" fill="black"/>
+                            </svg>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="flex-container-column">
+                <h1 class="page-title">Effect</h1>
+                <select formControlName="effect_id" class="creation-item-select my-2">
+                    <!--
+                        <option value="0">None</option>
+                    -->
+                    <option *ngFor="let effect of effects" [value]="effect.effect_id">{{ effect.effect_label }}</option>
+                </select>
+                <button 
+                    (click)="addEffectToTable()" 
+                    class="flex items-center justify-center text-black text-xs pb-2"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+                        <rect x="12.5" y="3" width="3" height="23" fill="black"/>
+                        <rect x="25.1355" y="12.3625" width="3" height="23" transform="rotate(90 25.1355 12.3625)" fill="black"/>
+                    </svg>
+                    Add effect
+                </button>
+                <ul>
+                    <li *ngFor="let effect of effectsAdded; let i = index">
+                        <button (click)="removeEffect(i)" class="text-black flex justify-center items-center">
+                            <span class="mr-2">{{ effect.effect_label }}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <rect y="5.0481" width="7.13924" height="25.8798" transform="rotate(-45 0 5.0481)" fill="black"/>
+                                <rect x="18.2998" width="7.13924" height="25.8798" transform="rotate(45 18.2998 0)" fill="black"/>
+                            </svg>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="flex-container-column">
+                <h1 class="page-title">Complexity</h1>
+                <select formControlName="level_id" class="creation-item-select my-2">
+                    <!--
+                        <option value="">None</option>
+                    -->
+                    <option *ngFor="let level of levels" [value]="level.level_id">{{ level.level_label }}</option>
+                </select>
+                <div *ngIf="levelIdControl.hasError('required')" class="page-message-erreur">
+                    The complexity is required *.
+                </div>
+            </div>
+            <div class="flex-container-column">
+                <h1 class="page-title">Side</h1>
+                <select formControlName="side_id" class="creation-item-select my-2">
+                    <!--
+                        <option value="0">None</option>
+                    -->
+                    <option *ngFor="let side of sides" [value]="side.side_id">{{ side.side_label }}</option>
+                </select>
+            </div>
+        </div>
+      
+        <div>
+            <h2 *ngIf="askedDescriptionControl.hasError('required')" class="page-message-erreur">The asked description is required *.</h2>
+            <h2 *ngIf="askedDescriptionControl.hasError('minlength')" class="page-message-erreur">The asked description must be at least 32 characters long *.</h2>
+            <textarea formControlName="asked_description" class="creation-item-textarea" placeholder="Description *"></textarea>
+        </div>
+        <div class="mt-2">
+            <textarea formControlName="Incident_report" class="creation-item-textarea" placeholder="Incident report"></textarea>
+        </div>
+        <div class="mt-2 grid lg:grid-cols-2 gap-6">
+            <textarea formControlName="prfs_analyse" class="creation-item-textarea" placeholder="Analysis"></textarea>
+            <textarea formControlName="prfs_root_cause" class="creation-item-textarea" placeholder="Root cause"></textarea>
+            <textarea formControlName="prfs_resume" class="creation-item-textarea" placeholder="Resume"></textarea>
+            <textarea formControlName="prfs_action_taken" class="creation-item-textarea" placeholder="Action Taken"></textarea>
+        </div>
+      
+        <div class="container-creation grid grid-cols-5 gap-4">
+            <div class="flex items-center">
+                <img src="assets/icons/clip.png" class="header-buttons-item-logo"/>
+                <h1 class="page-title"><span>Attachments: </span>{{ numberOfAttachments }}</h1>
+            </div>
+            <div class="col-span-2 page-attachements-info custom-scrollbar">   
+                <div class="flex-container-between">
+                    <h1 class="page-title">Name</h1>
+                    <h1 class="page-title">Size</h1>
+                </div>    
+                <div class="flex-container-between" *ngFor="let attachment of attachments">
+                    <h1 class="page-title-element">{{ attachment.name }}</h1>
+                    <h1 class="page-title-element">{{ attachment.size }}</h1>
+                </div>                                           
+            </div>
+            <div 
+                (drop)="onDrop($event)"
+                (dragover)="onDragOver($event)" 
+                class="col-span-2 page-attachements-drop"
+            >
+                <div class="flex justify-center">
+                    <label for="fileInput" class="page-title-element">Drag your file here to start uploading</label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex-1 border-t-2 border-[#E30039]"></div>
+                    <h1 class="text-center text-base md:text-lg font-semibold px-2"> Or </h1>
+                    <div class="flex-1 border-t-2 border-[#E30039]"></div>
+                </div>
+                <div class="flex justify-center">
+                    <button (click)="toggleBrowsefiles()" class="rounded-[10px] bg-custom text-black py-1 px-8">Browse files</button>
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <button [disabled]="loading" (click)="submitForm()" class="button-save text-black">
+                <span *ngIf="!loading">Create ticket</span>
+                <span *ngIf="loading" class="flex items-center">
+                    <svg class="animate-spin h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.963 7.963 0 014 12H0c0 4.418 3.582 8 8 8v-4.01zm13.196-1.383A10.001 10.001 0 0021.22 12h-4.02a6.001 6.001 0 11-6.001-6h-2a8.001 8.001 0 108.177 5.908l1.018 1.018z"></path>
+                    </svg>
+                    Loading...
+                </span>
+            </button>
+            <button type="button" class="button-cancel text-black" (click)="cancel()">Cancel</button>
+        </div>
+    </div>
+</form>
+<app-popup *ngIf="isVisible" [popupText]="text"></app-popup>
+
+<div *ngIf="isBrowsefiles" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isBrowsefiles" class="font-bold absolute top-[3rem] left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-[#E30039] bg-white z-50 py-2 shadow-lg ">
+    <div class="flex justify-between px-4 py-1 border-dashed border-b-2">
+        <div></div>
+        <div>
+            <h1 class="font-bold mb-1">Browse files</h1>
+        </div>
+        <div>
+            <img
+                (click)="toggleBrowsefiles()"
+                alt="Icon close"
+                src="assets/icons/close.png"
+                class="w-4 h-4 cursor-pointer"
+            />
+        </div>
+    </div>   
+    <div class="px-6 flex flex-col py-8">
+        <div class="my-2">
+            <input type="file" accept=".jpg, .png" class="hidden" id="photoInput" (change)="onFileChange($event, 'photo')" multiple>
+            <label for="photoInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Photo</h1>                
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".avi, .mov, .mp4" class="hidden" id="videoInput" (change)="onFileChange($event, 'video')" multiple>
+            <label for="videoInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Vidéo</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".pert" class="hidden" id="pertuInput" (change)="onFileChange($event, 'pertu')" multiple>
+            <label for="pertuInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Pertu</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".log" class="hidden" id="eventInput" (change)="onFileChange($event, 'event')" multiple>
+            <label for="eventInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Event</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".txt,.pdf,.doc,.xls, .csv" class="hidden" id="textInput" (change)="onFileChange($event, 'texte')" multiple>
+            <label for="textInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Texte</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" accept=".msg,.html" class="hidden" id="emailInput" (change)="onFileChange($event, 'e-mail')" multiple>
+            <label for="emailInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">E-mail</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" class="hidden" id="autresInput" (change)="onFileChange($event, 'autre')" multiple>
+            <label for="autresInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Autres</h1>    
+            </label>
+        </div>
+    </div>    
+</div>

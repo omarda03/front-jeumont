@@ -1,0 +1,255 @@
+<form [formGroup]="form">
+    <div class="container-page">
+        <div class="md:grid md:grid-cols-3 lg:grid-cols-4 grid-flow-col gap-4">
+            <div class="md:col-span-1 lg:col-span-1 bg-[#ffffff99] rounded-[10px] px-10 py-2 mb-2 flex flex-col justify-between">
+                <div>
+                    <input type="radio" class="mr-4" formControlName="urgency" [value]="true" />
+                    <label>24/7 Support</label>
+                </div>
+                <div>
+                    <input type="radio" class="mr-4" formControlName="urgency" [value]="false" />
+                    <label>Standard support</label>
+                </div>
+            </div>
+            <div class="md:col-span-2 lg:col-span-3 grid grid-cols-1 md:grid-cols-3 bg-[#ffffff99] rounded-[10px] mb-2">
+                <div class="mx-auto">
+                    <div class="flex justify-center items-center">
+                        <img alt="user logo" src="assets/icons/user.png" class="mx-auto my-2 w-6 h-6" />
+                        <h1 class="text-custom">*</h1>
+                    </div>
+                    <select (change)="changeUser()" formControlName="customer_uuid" class="bg-white border border-solid border-black mb-2 px-3 py-1 w-[200px]">
+                        <!--
+                            <option value="" disabled>None</option>
+                        -->
+                        <option *ngFor="let customer of customers" [value]="customer.customer_uuid">{{ customer.customer_name }}</option>
+                    </select>
+                </div>
+                <div class="mx-auto">
+                    <div class="flex justify-center items-center">
+                        <img alt="fleet logo" src="assets/icons/fleet.png" class="mx-auto my-2 w-16 h-6" />
+                        <h1 class="text-custom">*</h1>
+                    </div>
+                    <select (change)="changeFleet()" formControlName="fleet_id" class="bg-white border border-solid border-black mb-2 px-3 py-1 w-[200px]">
+                        <!--
+                            <option value="">None</option>
+                        -->
+                        <option *ngFor="let fleet of fleets" [value]="fleet.fleet_id">{{ fleet.fleet_name }}</option>
+                    </select>
+                </div>
+                <div class="mx-auto">
+                    <div class="flex justify-center items-center">
+                        <img alt="ship" src="assets/icons/ship.png" class="mx-auto my-2 w-12 h-6" />
+                        <h1 class="text-custom">*</h1>
+                    </div>
+                    <select formControlName="ship_uuid" class="bg-white border border-solid border-black mb-2 px-3 py-1 w-[200px]">
+                        <!--
+                            <option value="" >None</option>
+                        -->
+                        <option *ngFor="let ship of ships" [value]="ship.ship_uuid">{{ ship.ship_name }}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-2 grid grid-cols-2 lg:grid-cols-5 rounded-[10px] bg-[#ffffff99]">
+            <div class="mx-6 flex flex-col justify-start items-center">
+                <h1 class="text-center my-2">Production Item<span class="text-custom font-semibold">*</span></h1>
+                <select formControlName="prfm_item_piece" class="bg-white border border-solid border-black mb-2 px-3 py-1 w-full">
+                    <!--
+                        <option value="">None</option>
+                    -->
+                    <option *ngFor="let piece of pieces" [value]="piece.piece_uuid">{{ piece.piece_label }}</option>
+                </select>
+            </div>
+            <div class="mx-6 flex flex-col justify-start items-center">
+                <h1 class="text-center my-2">Side<span class="text-custom font-semibold">*</span></h1>
+                <select formControlName="side_id" class="bg-white border border-solid border-black mb-2 px-3 py-1 w-full">
+                    <!-- 
+                        <option value="0">None</option>
+                    -->
+                    <option *ngFor="let side of sides" [value]="side.side_id">{{ side.side_label }}</option>
+                </select>
+            </div>
+            <div class="mx-6 flex flex-col justify-start items-center">
+                <h1 class="text-center my-2">PRFS</h1>
+                <select formControlName="asked_uuid" class="bg-white border border-solid border-black mb-2 px-3 py-1 w-full">
+                    <!--
+                        <option value="">None</option>
+                    -->
+                    <option *ngFor="let prfs of prfss" [value]="prfs.asked_uuid">{{ prfs.asked_ref }}</option>
+                </select>
+                <button
+                    (click)="addAskedToTable()"
+                    class="flex items-center justify-center text-black text-xs pb-2"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+                        <rect x="12.5" y="3" width="3" height="23" fill="black"/>
+                        <rect x="25.1355" y="12.3625" width="3" height="23" transform="rotate(90 25.1355 12.3625)" fill="black"/>
+                    </svg>
+                    Add PRFS
+                </button>
+                <ul class="mb-2">
+                    <li *ngFor="let prfs of prfssAdded; let i = index">
+                        <button (click)="removeAsked(i)" class="flex justify-center text-black items-center">
+                            <span class="mr-2">{{ prfs.asked_ref }}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <rect y="5.0481" width="7.13924" height="25.8798" transform="rotate(-45 0 5.0481)" fill="black"/>
+                                <rect x="18.2998" width="7.13924" height="25.8798" transform="rotate(45 18.2998 0)" fill="black"/>
+                            </svg>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="mx-6 flex flex-col justify-start items-center">
+                <h1 class="text-center my-2">Ships</h1>
+                <select formControlName="ship_uuid" class="bg-white border border-solid border-black mb-2 px-3 py-1 w-[200px]">
+                    <!--
+                        <option value="" >None</option>
+                    -->
+                    <option *ngFor="let ship of ships" [value]="ship.ship_uuid">{{ ship.ship_name }}</option>
+                </select>
+                <button
+                    (click)="addShipToTable()"
+                    class="flex items-center justify-center text-black text-xs pb-2"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+                        <rect x="12.5" y="3" width="3" height="23" fill="black"/>
+                        <rect x="25.1355" y="12.3625" width="3" height="23" transform="rotate(90 25.1355 12.3625)" fill="black"/>
+                    </svg>
+                    Add Ship
+                </button>
+                <ul class="mb-2">
+                    <li *ngFor="let ship of shipsAdded; let i = index">
+                        <button (click)="removeShip(i)" class="text-black flex justify-center items-center">
+                            <span class="mr-2">{{ ship.ship_name }}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <rect y="5.0481" width="7.13924" height="25.8798" transform="rotate(-45 0 5.0481)" fill="black"/>
+                                <rect x="18.2998" width="7.13924" height="25.8798" transform="rotate(45 18.2998 0)" fill="black"/>
+                            </svg>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="mx-6 flex flex-col justify-start items-center">
+                <h1 class="text-center my-2">Document<span class="text-custom font-semibold">*</span></h1>
+                <label class="custom-checkbox">
+                    <input type="checkbox" formControlName="prfm_document" class="sr-only peer">
+                    <div class="checkbox-background"></div>
+                </label>
+            </div>
+        </div>
+
+        <div class="mt-1">
+            <div *ngIf="askedDescriptionControl.hasError('required')" class="text-[#FF0000] text-sm">
+                The asked description is required *.
+            </div>
+            <div *ngIf="askedDescriptionControl.hasError('minlength')" class="text-[#FF0000] text-sm">
+                The asked description must be at least 32 characters long *.
+            </div>
+            <textarea
+                formControlName="asked_description"
+                class="description p-2 text-black bg-[#ffffff99] w-[100%] h-[140px] border border-solid border-black mt-1 rounded-[10px]"
+                placeholder="Description *"
+            ></textarea>
+        </div>
+
+        <div class="mt-1">
+            <div *ngIf="prfmResumeControl.hasError('required')" class="text-[#FF0000] text-sm">
+                The prfm resume is required *.
+            </div>
+            <div *ngIf="prfmResumeControl.hasError('minlength')" class="text-[#FF0000] text-sm">
+                The prfm resume must be at least 32 characters long *.
+            </div>
+            <textarea
+                formControlName="prfm_resume"
+                class="description p-2 text-black bg-[#ffffff99] w-[100%] h-[130px] border border-solid border-black mt-1 rounded-[10px]"
+                placeholder="Remarks *"
+            ></textarea>
+        </div>
+
+        <div class="mt-1">
+            <div  *ngIf="form.value.prfm_document" class="bg-[#ffffff99] h-auto py-2 px-4 rounded-[10px] mb-2 grid grid-cols-5">
+                <div class="flex items-center">
+                    <img src="assets/icons/clip.png" />
+                    <h1><span class="hidden lg:inline">Attachments: </span>{{ numberOfAttachments }}</h1>
+                </div>
+                <div class="col-span-2 bg-[#D9D9D9] p-2 mx-2 rounded-[10px] h-[75px] overflow-y-scroll custom-scrollbar">
+                    <div class="flex items-center justify-between">
+                        <h1 class="text-sm text-[#00000059]">Name</h1>
+                        <h1 class="text-sm text-[#00000059]">Size</h1>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-black" *ngFor="let attachment of attachments">
+                        <h1>{{ attachment.name }}</h1>
+                        <h1>{{ attachment.size }}</h1>
+                    </div>
+                </div>
+                <div
+                    (drop)="onDrop($event)"
+                    (dragover)="onDragOver($event)"
+                    class="col-span-2 border border-dotted border-black p-2 rounded-[10px] text-[10px]"
+                >
+                    <div class="flex justify-center">
+                        <label for="fileInput" class="font-semibold cursor-pointer text-center">Drag your file here to start uploading</label>
+                    </div>
+                    <div class="flex items-center justify-between mx-16">
+                        <div class="flex-1 border-t-2 border-[#E30039]"></div>
+                        <h1 class="text-center text-base md:text-lg font-semibold px-2"> Or </h1>
+                        <div class="flex-1 border-t-2 border-[#E30039]"></div>
+                    </div>
+                    <div class="flex justify-center">
+                        <button (click)="toggleBrowsefiles()" class="rounded-[10px] bg-custom text-black py-1 px-8">Browse files</button>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <button 
+                    [disabled]="loading" 
+                    (click)="uploadFile('ahh', 'sjahjads')"
+                    class="col-span-1 flex justify-center items-center h-[70px] text-black font-bold bg-custom border border-solid border-black rounded-[10px]">
+                    <span *ngIf="!loading">Create ticket</span>
+                    <span *ngIf="loading" class="flex items-center">
+                        <svg class="animate-spin h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.963 7.963 0 014 12H0c0 4.418 3.582 8 8 8v-4.01zm13.196-1.383A10.001 10.001 0 0021.22 12h-4.02a6.001 6.001 0 11-6.001-6h-2a8.001 8.001 0 108.177 5.908l1.018 1.018z"></path>
+                        </svg>
+                        Loading...
+                    </span>
+                </button>
+                <button type="button" class="col-span-1 h-[70px] bg-white text-black font-bold border border-solid border-black rounded-[10px]" (click)="cancel()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</form>
+<app-popup *ngIf="isVisible" [popupText]="text"></app-popup>
+
+<div *ngIf="isBrowsefiles" class="fixed inset-0 bg-black opacity-50 z-40"></div>
+<div *ngIf="isBrowsefiles" class="font-bold absolute top-1/3 left-1/2 rounded-[20px] transform -translate-x-1/2 border border-solid border-[#E30039] bg-white z-50 py-2 shadow-lg ">
+    <div class="flex justify-between px-4 py-1 border-dashed border-b-2">
+        <div></div>
+        <div>
+            <h1 class="font-bold mb-1">Browse files</h1>
+        </div>
+        <div>
+            <img
+                (click)="toggleBrowsefiles()"
+                alt="Icon close"
+                src="assets/icons/close.png"
+                class="w-4 h-4 cursor-pointer"
+            />
+        </div>
+    </div>   
+    <div class="px-6 flex flex-col py-8">
+        <div class="my-2">
+            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="pddInput" (change)="onFileChange($event, 'OMD')" multiple>
+            <label for="pddInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Officiel modification document</h1>    
+            </label>
+        </div>
+        <div class="my-2">
+            <input type="file" class="hidden" id="autresInput" (change)="onFileChange($event, 'other')" multiple>
+            <label for="autresInput">
+                <h1 class="cursor-pointer text-center rounded-[10px] w-[15rem] bg-custom text-white font-bold shadow-lg py-3 px-8">Others</h1>    
+            </label>
+        </div>
+    </div>
+</div>

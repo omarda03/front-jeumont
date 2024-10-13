@@ -1,24 +1,76 @@
-button.active {
+.container-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+
+  @media (min-width: 768px) {
+      flex-direction: row;
+  }
+}
+
+.dashboard-menu {
+  background-color: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  padding: 1rem;
+
+  @media (min-width: 768px) {
+    width: 25%;
+  }
+}
+
+.dashboard-main {
+  flex-grow: 1;
+  background-color: #f9f9f9;
+  padding: 0.5rem; /* Réduction du padding pour mobile */
+  overflow-y: auto;
+
+  @media (min-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+button {
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+
+  &:hover {
+    background-color: #2563eb;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    background-color: #cbd5e0;
+  }
+}
+
+.pagination {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @media (min-width: 768px) {
+      flex-direction: row;
+      justify-content: space-between;
+  }
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #2563eb #f1f1f1;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #2563eb;
   border-radius: 10px;
-  border: 1px dashed rgba(0, 0, 0, 0.50);
-  background: #C8E1FF;
-  padding: 2px;
-  width: 80px;
 }
 
-.circle {
-  width: 12px;
-  height: 12px;
-  display: inline-block;
-  border-radius: 50%;
-  margin-right: 6px;
-}
-
-.selected {
-  color: white;
-  background-color: #E30039;
-}
-
-select, input {
-  outline: none;
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
 }

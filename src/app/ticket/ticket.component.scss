@@ -1,36 +1,39 @@
 .item {
     width: 99%;
-    margin-bottom: 6px;
+    margin-bottom: 4px; /* Réduction de la marge */
     border-radius: 10px;
     border: 1px solid gray;
-    overflow: hidden; /* Ensure child elements don't overflow */
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
     
     &-right {
-        float: left;
-        padding: 5px;
+        padding: 3px; /* Réduction du padding */
         width: 55%;
         position: relative;
         height: 85px;
 
         .up-border, .down-border {
-            padding: 10px;
+            padding: 8px; /* Réduction du padding */
             background-color: #ddd;
             border-radius: 50%;
             position: absolute;
         }
 
         & .up-border {
-            top: -8px;
-            right: -35px;
+            top: -6px;
+            right: -30px;
             border-bottom: 1px solid gray;
         }
 
         & .down-border {
-            bottom: -13px;
-            right: -35px;
+            bottom: -10px;
+            right: -30px;
             border-top: 1px solid gray;
         }
-        
+
         &::after {
             content: '';
             display: block;
@@ -40,41 +43,59 @@
             position: absolute;
             top: 13px;
             right: -25px; 
-            border-style: dotted; 
-        }
-
-        @media (max-width: 1280px) { /* Taille "lg" (large) de Tailwind CSS */
-            width: 100%;
-            height: auto; /* Adjust height as needed */
-
-            /* Move the styles to bottom border */
-            &::after {
-                content: '';
-                display: block;
-                width: 95%;
-                height: 1px;
-                background-color: gray;
-                position: absolute;
-                left: 13px;
-                right: 13px;
-                top: 85px; 
-                border-style: dotted; 
-            }
+            border-style: dotted;
         }
     }
 
     &-left {
-        float: right;
-        padding: 5px;
+        padding: 3px; /* Réduction du padding */
+        width: 40%;
+    }
 
-        @media (max-width: 1280px) { /* Taille "lg" (large) de Tailwind CSS */
+    @media (max-width: 1280px) {
+        flex-direction: column;
+        align-items: flex-start;
+
+        &-right {
             width: 100%;
+            height: auto;
+            padding: 3px; /* Réduction du padding */
+            
+            &::after {
+                width: 95%;
+                height: 1px;
+                top: 75px;
+                left: 13px;
+                right: 13px;
+                border-style: dotted;
+            }
+
+            .up-border, .down-border {
+                display: none; /* Masquer les bordures sur mobile */
+            }
+        }
+
+        &-left {
+            width: 100%;
+            padding: 3px; /* Réduction du padding */
+        }
+    }
+
+    @media (max-width: 768px) { /* Mobile */
+        &-right {
+            padding: 5px; /* Ajustement léger du padding */
+            &::after {
+                top: 65px;
+            }
+        }
+
+        &-left {
+            padding: 5px; /* Ajustement léger du padding */
         }
     }
 
     &.expanded {
-        /* Styles pour l'expansion du ticket */
         height: auto;
-        max-height: 9999px; /* Valeur suffisamment grande pour permettre l'expansion complète */
+        max-height: 9999px;
     }
 }

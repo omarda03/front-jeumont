@@ -226,7 +226,23 @@ tbody tr:nth-child(even) {
     font-size: larger;
     font-weight: bold;
     text-transform: uppercase;
+
+    /* Style pour petits écrans (smartphones) */
+    @media (max-width: 768px) {
+        font-size: 1rem; /* Ajuste la taille du texte pour les petits écrans */
+    }
+
+    /* Style pour tablettes */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        font-size: 1.2rem; /* Ajuste la taille du texte pour les tablettes */
+    }
+
+    /* Style pour grands écrans (ordinateurs de bureau) */
+    @media (min-width: 1025px) {
+        font-size: 1.5rem; /* Taille du texte pour les grands écrans */
+    }
 }
+
 
 .nav-sec-1 {
     display: flex;
@@ -238,7 +254,27 @@ tbody tr:nth-child(even) {
     display: flex;
     justify-content: center;
     align-items: center;
+
+    /* Styles pour petits écrans (smartphones) */
+    @media (max-width: 768px) {
+        flex-direction: column; /* Les éléments s'empilent verticalement sur petits écrans */
+        justify-content: flex-start; /* Alignement des éléments en haut */
+        padding: 10px; /* Ajout de padding pour une meilleure présentation sur mobile */
+    }
+
+    /* Styles pour tablettes */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        flex-direction: row; /* Les éléments restent alignés horizontalement */
+        justify-content: space-around; /* Distribution égale des éléments */
+    }
+
+    /* Styles pour grands écrans (ordinateurs de bureau) */
+    @media (min-width: 1025px) {
+        justify-content: center; /* Les éléments sont centrés sur les grands écrans */
+        flex-direction: row; /* Disposition horizontale classique */
+    }
 }
+
 
 .nav-sec-3 {
     display: flex;
@@ -373,67 +409,91 @@ input, select, textarea {
 }
 
 .container-page {
-
     background: #D9D9D9;
-    padding: .5rem 3rem;
+    padding: .5rem 1rem; /* Réduction du padding pour les petits écrans */
     margin: 0 .4rem;
+
+    @media (min-width: 768px) { /* Pour les écrans moyens (tablettes) et plus grands */
+        padding: .5rem 3rem; /* Revenir à un padding plus large sur les grands écrans */
+    }
+
+    @media (min-width: 1024px) { /* Pour les grands écrans (PC) */
+        padding: 1rem 4rem; /* Augmenter légèrement le padding pour les très grands écrans */
+    }
 }
+
 
 /* Page dashboard ------ */
 .dashboard-menu {
     display: grid;
     padding: 1rem 0;
     align-items: center;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
+    grid-template-columns: 1fr; /* 1 colonne sur mobile */
+    gap: 0.5rem; /* Réduction de l'espacement */
+
+    @media (min-width: 768px) { /* Pour les écrans plus grands (tablettes et +) */
+        grid-template-columns: repeat(3, 1fr); /* 3 colonnes sur les grands écrans */
+        gap: 1rem;
+    }
 }
 
 .dashboard-menu-item-select {
-    font-size: .9rem;
+    font-size: .85rem; /* Légère réduction pour mobile */
     font-weight: 500;
-    padding: .25rem;
+    padding: .5rem; /* Augmenter légèrement pour mobile */
     font-family: 'Inter';
-    width: 7rem;
+    width: 100%; /* Occupe toute la largeur sur mobile */
     border: 1px solid #000000;
+
+    @media (min-width: 768px) {
+        width: 7rem; /* Largeur réduite pour les écrans plus grands */
+    }
 }
 
 .dashboard-menu-item-search {
-    font-size: .9rem;
+    font-size: .85rem; /* Légère réduction pour mobile */
     font-weight: 500;
-    padding: .25rem;
+    padding: .5rem; /* Augmenter légèrement pour mobile */
     font-family: 'Inter';
-    width: 15rem;
+    width: 100%; /* Occupe toute la largeur sur mobile */
     border-radius: .25rem;
     border: 1px solid #000000;
+
+    @media (min-width: 768px) {
+        width: 15rem; /* Largeur normale sur les écrans plus grands */
+    }
 }
 
-.dashboard-menu-item-1 {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-}
-
-.dashboard-menu-item-2 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
+.dashboard-menu-item-1, 
+.dashboard-menu-item-2, 
 .dashboard-menu-item-3 {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center; /* Centrer pour mobile */
     align-items: center;
+
+    @media (min-width: 768px) {
+        justify-content: flex-start; /* Alignement différent pour les écrans plus grands */
+    }
 }
 
 .dashboard-main {
-    height: 43rem;
+    height: auto; /* Hauteur automatique pour les petits écrans */
+    min-height: 100vh; /* Pour occuper tout l'écran sur mobile */
+
+    @media (min-width: 768px) {
+        height: 43rem; /* Hauteur fixe pour les grands écrans */
+    }
 }
 
 .dashboard-links {
     display: grid;
     align-items: center;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr; /* 1 colonne sur mobile */
     gap: 1rem;
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(2, 1fr); /* 2 colonnes sur les grands écrans */
+    }
 }
 
 .dashboard-links-item {
@@ -441,9 +501,14 @@ input, select, textarea {
     display: flex;
     justify-content: center;
     background: #D9D9D9;
-    padding: 2.5rem 0;
+    padding: 1.5rem 0; /* Réduction du padding pour mobile */
     border-radius: .25rem;
+
+    @media (min-width: 768px) {
+        padding: 2.5rem 0; /* Padding plus grand pour les grands écrans */
+    }
 }
+
 
 /* Statistique -------- */
 .statistique-main {

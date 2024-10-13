@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { TicketsService } from '../services/tickets.service';
 import { SharedTitleService } from '../services/shared-title.service';
 import { InfosService } from '../services/infos.service';
-import * as XLSX from 'xlsx';
-import * as jsPDF from 'jspdf';
 import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from '../services/auth.service';
 import { CustomerService } from '../services/customer.service';
@@ -76,9 +74,13 @@ export class ClientComponent implements OnInit {
     if (this.authService.getUserRole() === 10) {
       this.customerService.getFleetByUser(this.cookieService.get('user_uuid')).subscribe(
         data => {
-          data.forEach((fleet:any) => {
+          data.forEach((fleet: any) => {
             this.ticketsService.getAskedDataClientFleet(this.currentPage, this.searchDescription, 1, this.sortOption, this.typeFilter, this.statusFilter, fleet.fleet_id, this.selectedOptionSort, this.pageSize).subscribe(
               (data) => {
+                // Ajoute un champ 'showDetails' à chaque ticket pour gérer l'affichage des détails
+                data.askedsList.forEach((ticket: any) => {
+                  ticket.showDetails = false;
+                });
                 this.tickets = data.askedsList;
                 this.count = data.count;
                 this.isLoading = false;
@@ -114,6 +116,10 @@ export class ClientComponent implements OnInit {
         this.tag
       ).subscribe(
         (data) => {
+          // Ajoute un champ 'showDetails' à chaque ticket pour gérer l'affichage des détails
+          data.askedsList.forEach((ticket: any) => {
+            ticket.showDetails = false;
+          });
           this.tickets = data.askedsList;
           this.count = data.count;
           this.isLoading = false;
@@ -152,5 +158,10 @@ export class ClientComponent implements OnInit {
     }
 
     this.fetchTickets();
+  }
+
+  // Méthode pour basculer l'affichage des détails d'un ticket
+  toggleDetails(ticket: any): void {
+    ticket.showDetails = !ticket.showDetails;
   }
 }

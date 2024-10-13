@@ -4,7 +4,8 @@
     border-radius: 10px;
     border: 1px solid gray;
     overflow: hidden; 
-    
+
+    /* Styles pour les grands écrans (PC) */
     &-right {
         float: left;
         padding: 5px;
@@ -30,7 +31,7 @@
             right: -35px;
             border-top: 1px solid gray;
         }
-        
+
         &::after {
             content: '';
             display: block;
@@ -39,14 +40,15 @@
             background-color: gray;
             position: absolute;
             top: 13px;
-            right: -25px; 
+            right: -25px;
             border-style: dotted; 
         }
 
+        /* Ajustement pour les grands écrans */
         @media (max-width: 1280px) { 
             width: 100%;
             height: auto; 
-            
+
             &::after {
                 content: '';
                 display: block;
@@ -75,5 +77,58 @@
     &.expanded {
         height: auto;
         max-height: 9999px; 
+    }
+
+    /* Styles pour les petits écrans (Téléphones) */
+    @media (max-width: 768px) {
+        .ticket-flex-center,
+        .ticket-col-between,
+        .ticket-right {
+            display: none; /* Masquer tous les éléments non nécessaires pour les petits écrans */
+        }
+
+        /* Afficher uniquement les éléments essentiels sur les téléphones */
+        .ticket-title, .ticket-title-element, .ticket-color, .ticket-title-element-date, .ticket-close-icon {
+            display: block;
+        }
+
+        .ticket {
+            width: 100%;
+            margin: 0;
+            padding: 0.5rem; /* Ajustement pour une meilleure lisibilité sur mobile */
+        }
+
+        .ticket-flex-center, .ticket-col-between {
+            flex-direction: column;
+        }
+
+        .ticket-section {
+            position: relative; /* Nécessaire pour positionner des éléments en absolu à l'intérieur */
+            padding: 10px;
+        }
+        
+        .button-container {
+            position: absolute; /* Positionne le bouton de manière absolue */
+            right: 10px; /* Aligne le bouton à droite */
+            top: 50%; /* Centre verticalement */
+            transform: translateY(-50%); /* Ajuste le bouton pour être parfaitement centré verticalement */
+        }
+        
+        .ticket-close-icon {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
+        
+        
+
+        /* Assure que le texte soit bien lisible sur mobile */
+        h1.ticket-title, h2.ticket-title-element {
+            font-size: 1.2rem;
+        }
+
+        h5.ticket-title-element-date {
+            font-size: 1rem;
+        }
     }
 }
